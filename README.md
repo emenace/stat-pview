@@ -77,14 +77,29 @@ npm run test:api
 
 ```text
 stat-pview/
-├── data/               # Standalone SQLite database file storage
+├── data/                       # SQLite database file storage (git-ignored)
 ├── src/
-│   ├── config/         # Database and session initialization
-│   ├── controllers/    # MVC request controllers
-│   ├── middlewares/    # Authentication and role checking middlewares
-│   ├── models/         # Parameterized SQLite query models
-│   ├── routes/         # Express API route definitions
-│   └── utils/          # Helper utilities
-├── public/             # Static HTML, CSS (Tailwind), and JS assets
+│   ├── config/
+│   │   └── database.js         # SQLite bootstrapper, DDL schemas, and env-aware seeding
+│   ├── controllers/            # MVC request controllers (auth, category, column, record, chart)
+│   ├── middlewares/            # Auth session & admin role middlewares
+│   ├── models/                 # Parameterized SQLite query models
+│   ├── routes/                 # Express API route definitions
+│   └── utils/
+│       └── test_api.js         # Automated backend API test suite
+├── public/
+│   ├── css/
+│   │   ├── input.css           # Tailwind CSS source
+│   │   └── output.css          # Compiled Tailwind CSS
+│   ├── js/
+│   │   ├── api-service.js      # Modular fetch() wrappers & toast notifications
+│   │   ├── chart-handler.js    # Dynamic Chart.js renderer (bar, line, pie, doughnut, area)
+│   │   ├── table-handler.js    # Dynamic Tabulator.js grid builder
+│   │   └── dashboard.js        # Public dashboard orchestrator
+│   ├── assets/                 # Static images and media
+│   └── index.html              # Public dashboard page
+├── tailwind.config.js          # Tailwind CSS configuration
+├── package.json                # NPM dependencies and scripts
 └── README.md
 ```
+

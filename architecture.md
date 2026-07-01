@@ -119,24 +119,26 @@ A major technical challenge in dynamic dashboard builders is enabling custom col
 
 ## 4. Frontend Architecture
 
-### 4.1 Client-Side State & DOM Rendering
-The frontend is built using clean, modular ES6 JavaScript without heavy bundling requirements during prototyping:
-* **`dashboard.js`**:
-  1. On page load, calls `GET /api/categories` and populates the category navigation tabs/dropdown.
-  2. When a category is selected, fetches `/api/charts/:category_id` and `/api/records/:category_id`.
-  3. Rebuilds the **Chart.js** instance and re-initializes the **Tabulator.js** table grid.
-* **`admin.js`**:
-  1. Manages modal dialogs for Category CRUD and Custom Column definitions.
-  2. Dynamically generates form input fields (`<input type="text|number|date">` or `<select>`) based on fetched column metadata.
-  3. Sends serialized JSON bodies to the REST API endpoints.
+### 4.1 Client-Side Modules (ES6)
+The frontend is built using clean, modular ES6 JavaScript (`type="module"`) without heavy bundling:
+
+| Module | Responsibility |
+|--------|---------------|
+| `api-service.js` | Modular `fetch()` wrappers for all API endpoints, global error handling, and toast notification system |
+| `chart-handler.js` | Dynamic Chart.js renderer supporting `bar`, `line`, `pie`, `doughnut`, `area` with named gradient palettes (`default`, `indigo`, `emerald`, `rose`) |
+| `table-handler.js` | Dynamic Tabulator.js grid builder — auto-translates `custom_columns` into formatted column definitions with number/date/boolean formatting |
+| `dashboard.js` | Orchestrator — dark mode, auth state check, category tab selection, parallel data loading, empty-state handling |
 
 ### 4.2 Chart & Table Integration Flow
 ```mermaid
 flowchart LR
-    A[User Selects Category] -->|1. Fetch Schema & Config| B(GET /api/categories/:id/config)
-    A -->|2. Fetch Row Data| C(GET /api/records/:category_id)
-    B --> D[Parse Chart Config & Table Headers]
-    C --> E[Extract JSON Row Data]
-    D & E --> F[Initialize Chart.js Canvas]
-    D & E --> G[Initialize Tabulator.js Grid]
+    A[User Selects Category Tab] -->|Parallel Fetch| B(GET /api/columns/:id)
+    A -->|Parallel Fetch| C(GET /api/records/:id)
+    A -->|Parallel Fetch| D(GET /api/charts/:id)
+    B --> E[Build Tabulator Column Defs]
+    C --> F[Flatten JSON Records]
+    D --> G[Extract Chart Labels + Values]
+    E & F --> H[Render Tabulator.js Grid]
+    G --> I[Render Chart.js Canvas]
 ```
+

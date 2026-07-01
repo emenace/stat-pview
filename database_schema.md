@@ -2,6 +2,8 @@
 
 This document defines the SQLite database schema, table relations, and sample queries for **Statistic Public View**. We use a hybrid architecture combining standard relational integrity with JSON storage for user-defined attributes.
 
+> **Note**: The database file is environment-aware. In development mode, the app uses `data/stat-pview-dummy.sqlite` with auto-seeded demo data. In production mode, it uses `data/stat-pview-prod.sqlite` with real credentials from environment variables. Both are git-ignored.
+
 ---
 
 ## 1. Entity-Relationship Diagram (ERD)

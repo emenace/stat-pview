@@ -226,14 +226,20 @@ This specification documents the REST API endpoints for **Statistic Public View*
   {
     "success": true,
     "data": {
-      "id": 1,
-      "category_id": 1,
-      "chart_type": "bar",
-      "x_axis_column": "month",
-      "y_axis_column": "ridership_count",
-      "group_by_column": null,
-      "palette": "indigo-gradient",
-      "title": "Monthly Public Transit Ridership (2026)"
+      "config": {
+        "id": 1,
+        "category_id": 1,
+        "chart_type": "bar",
+        "x_axis_column": "month",
+        "y_axis_column": "ridership_count",
+        "group_by_column": null,
+        "palette": "default",
+        "title": "Monthly Public Transit Ridership (2026)"
+      },
+      "chartData": {
+        "labels": ["January 2026", "February 2026", "March 2026"],
+        "values": [142000, 158000, 167500]
+      }
     }
   }
   ```

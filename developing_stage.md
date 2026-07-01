@@ -90,24 +90,24 @@ As developers or AI agents complete each task, change the markdown checkbox from
 ## Stage 4: Frontend Core & Public Dashboard (User Role)
 *Goal: Build the public interactive dashboard featuring vibrant styling, category selection, dynamic Chart.js rendering, and Tabulator.js data tables.*
 
-- [ ] **4.1 Base UI Layout & Navigation (`/public/index.html`)**:
-  - [ ] Build responsive header with Kemenag/Organization branding, dark/light mode toggle, and Login link.
-  - [ ] Design glassmorphic container layout for dashboard widgets.
-  - [ ] Implement category selection tab bar / dropdown with smooth hover transitions.
-- [ ] **4.2 Client-Side Data Service (`/public/js/api-service.js`)**:
-  - [ ] Create modular JS wrappers around `fetch()` for `/api/categories`, `/api/charts`, `/api/columns`, and `/api/records`.
-  - [ ] Implement global error handling and notification toasts.
-- [ ] **4.3 Dynamic Chart.js Renderer (`/public/js/chart-handler.js`)**:
-  - [ ] Initialize Chart.js canvas with responsive sizing and retina display support.
-  - [ ] Write dynamic chart builder that transforms JSON data records into Chart.js datasets based on selected `x_axis_column` and `y_axis_column`.
-  - [ ] Implement visual support for all chart types (`bar`, `line`, `pie`, `doughnut`, `area`) with rich gradient palettes.
-- [ ] **4.4 Dynamic Tabulator.js Table Grid (`/public/js/table-handler.js`)**:
-  - [ ] Initialize Tabulator.js grid bound to the table container div.
-  - [ ] Write dynamic header generator that translates `custom_columns` into Tabulator column definitions (including formatting numbers, dates, and text alignment).
-  - [ ] Enable client-side searching, column sorting, and responsive table layout wrapping.
-- [ ] **4.5 Dashboard Orchestrator (`/public/js/dashboard.js`)**:
-  - [ ] Connect category tab selection event to trigger simultaneous loading of chart and table widgets.
-  - [ ] Add empty-state UI placeholders when a category has no data records yet.
+- [x] **4.1 Base UI Layout & Navigation (`/public/index.html`)**:
+  - [x] Build responsive header with Kemenag/Organization branding, dark/light mode toggle, and Login link.
+  - [x] Design glassmorphic container layout for dashboard widgets.
+  - [x] Implement category selection tab bar / dropdown with smooth hover transitions.
+- [x] **4.2 Client-Side Data Service (`/public/js/api-service.js`)**:
+  - [x] Create modular JS wrappers around `fetch()` for `/api/categories`, `/api/charts`, `/api/columns`, and `/api/records`.
+  - [x] Implement global error handling and notification toasts.
+- [x] **4.3 Dynamic Chart.js Renderer (`/public/js/chart-handler.js`)**:
+  - [x] Initialize Chart.js canvas with responsive sizing and retina display support.
+  - [x] Write dynamic chart builder that transforms JSON data records into Chart.js datasets based on selected `x_axis_column` and `y_axis_column`.
+  - [x] Implement visual support for all chart types (`bar`, `line`, `pie`, `doughnut`, `area`) with rich gradient palettes.
+- [x] **4.4 Dynamic Tabulator.js Table Grid (`/public/js/table-handler.js`)**:
+  - [x] Initialize Tabulator.js grid bound to the table container div.
+  - [x] Write dynamic header generator that translates `custom_columns` into Tabulator column definitions (including formatting numbers, dates, and text alignment).
+  - [x] Enable client-side searching, column sorting, and responsive table layout wrapping.
+- [x] **4.5 Dashboard Orchestrator (`/public/js/dashboard.js`)**:
+  - [x] Connect category tab selection event to trigger simultaneous loading of chart and table widgets.
+  - [x] Add empty-state UI placeholders when a category has no data records yet.
 
 ---
 
