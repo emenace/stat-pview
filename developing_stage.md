@@ -9,44 +9,44 @@ As developers or AI agents complete each task, change the markdown checkbox from
 ## Stage 0: Project Initialization & Core Environment Setup
 *Goal: Establish the Node.js project structure, install foundational dependencies, and configure the development environment.*
 
-- [ ] **0.1 Initialize NPM & Package Structure**:
-  - [ ] Run `npm init -y` to create `package.json`.
-  - [ ] Configure ES Module support (`"type": "module"`) or Standard CommonJS consistent with project architecture.
-  - [ ] Add standard npm scripts: `"start": "node src/server.js"`, `"dev": "nodemon src/server.js"`, and Tailwind CSS compilation scripts.
-- [ ] **0.2 Install Core Backend Dependencies**:
-  - [ ] Install production packages: `express`, `better-sqlite3` (or `sqlite3`), `express-session`, `bcrypt`, `cors`, `dotenv`.
-  - [ ] Install development packages: `nodemon`, `tailwindcss`, `postcss`, `autoprefixer`.
-- [ ] **0.3 Create Directory Architecture**:
-  - [ ] Create backend directories: `/data`, `/src/config`, `/src/controllers`, `/src/middlewares`, `/src/models`, `/src/routes`, `/src/utils`.
-  - [ ] Create frontend directories: `/public/css`, `/public/js`, `/public/assets`.
-- [ ] **0.4 Configure Tailwind CSS & Static Assets**:
-  - [ ] Initialize `tailwind.config.js` with custom vibrant color palettes, dark mode toggles, and content scanning paths (`./public/**/*.html`, `./public/js/**/*.js`).
-  - [ ] Create `/public/css/input.css` with `@tailwind base; @tailwind components; @tailwind utilities;`.
-- [ ] **0.5 Create Base HTTP Server (`src/server.js`)**:
-  - [ ] Initialize Express app with JSON body parsing (`express.json()`), URL encoding, and static file serving (`express.static('public')`).
-  - [ ] Set up basic health-check endpoint (`GET /api/health`).
+- [x] **0.1 Initialize NPM & Package Structure**:
+  - [x] Run `npm init -y` to create `package.json`.
+  - [x] Configure ES Module support (`"type": "module"`) or Standard CommonJS consistent with project architecture.
+  - [x] Add standard npm scripts: `"start": "node src/server.js"`, `"dev": "nodemon src/server.js"`, and Tailwind CSS compilation scripts.
+- [x] **0.2 Install Core Backend Dependencies**:
+  - [x] Install production packages: `express`, `better-sqlite3` (or `sqlite3`), `express-session`, `bcrypt`, `cors`, `dotenv`.
+  - [x] Install development packages: `nodemon`, `tailwindcss`, `postcss`, `autoprefixer`.
+- [x] **0.3 Create Directory Architecture**:
+  - [x] Create backend directories: `/data`, `/src/config`, `/src/controllers`, `/src/middlewares`, `/src/models`, `/src/routes`, `/src/utils`.
+  - [x] Create frontend directories: `/public/css`, `/public/js`, `/public/assets`.
+- [x] **0.4 Configure Tailwind CSS & Static Assets**:
+  - [x] Initialize `tailwind.config.js` with custom vibrant color palettes, dark mode toggles, and content scanning paths (`./public/**/*.html`, `./public/js/**/*.js`).
+  - [x] Create `/public/css/input.css` with `@tailwind base; @tailwind components; @tailwind utilities;`.
+- [x] **0.5 Create Base HTTP Server (`src/server.js`)**:
+  - [x] Initialize Express app with JSON body parsing (`express.json()`), URL encoding, and static file serving (`express.static('public')`).
+  - [x] Set up basic health-check endpoint (`GET /api/health`).
 
 ---
 
 ## Stage 1: Database Initialization & Auth Foundation
 *Goal: Set up the hybrid SQLite database engine, auto-execute DDL schemas, and build secure session authentication.*
 
-- [ ] **1.1 SQLite Database Bootstrapper (`src/config/database.js`)**:
-  - [ ] Establish SQLite database connection to `/data/stat-pview.sqlite`.
-  - [ ] Execute automated DDL statements for all tables: `users`, `categories`, `custom_columns`, `data_records`, and `chart_configs` (from `database_schema.md`).
-  - [ ] Add WAL mode (`PRAGMA journal_mode = WAL;`) and foreign key enforcement (`PRAGMA foreign_keys = ON;`) for performance and integrity.
-- [ ] **1.2 Default Account Seeder**:
-  - [ ] Implement startup check to verify if `users` table is empty.
-  - [ ] Auto-seed default Administrator account (`username: 'admin'`, password hashed with `bcrypt`, `role: 'admin'`).
-  - [ ] Auto-seed default Standard Viewer account (`username: 'user'`, password hashed with `bcrypt`, `role: 'user'`).
-- [ ] **1.3 Session & Auth Middleware**:
-  - [ ] Configure `express-session` with secure HTTP-only cookie parameters and secret key.
-  - [ ] Create `src/middlewares/authMiddleware.js` to validate active user sessions.
-  - [ ] Create `src/middlewares/adminOnly.js` to restrict CRUD operations to Admin roles.
-- [ ] **1.4 Authentication MVC Module**:
-  - [ ] Implement `src/models/auth_model.js`: User lookup by username.
-  - [ ] Implement `src/controllers/auth_controller.js`: Login validation, password comparison, session establishment, and logout.
-  - [ ] Implement `src/routes/auth_routes.js`: Bind `/api/auth/login`, `/api/auth/logout`, and `/api/auth/me`.
+- [x] **1.1 SQLite Database Bootstrapper (`src/config/database.js`)**:
+  - [x] Establish SQLite database connection to `/data/stat-pview.sqlite`.
+  - [x] Execute automated DDL statements for all tables: `users`, `categories`, `custom_columns`, `data_records`, and `chart_configs` (from `database_schema.md`).
+  - [x] Add WAL mode (`PRAGMA journal_mode = WAL;`) and foreign key enforcement (`PRAGMA foreign_keys = ON;`) for performance and integrity.
+- [x] **1.2 Default Account Seeder**:
+  - [x] Implement startup check to verify if `users` table is empty.
+  - [x] Auto-seed default Administrator account (`username: 'admin'`, password hashed with `bcrypt`, `role: 'admin'`).
+  - [x] Auto-seed default Standard Viewer account (`username: 'user'`, password hashed with `bcrypt`, `role: 'user'`).
+- [x] **1.3 Session & Auth Middleware**:
+  - [x] Configure `express-session` with secure HTTP-only cookie parameters and secret key.
+  - [x] Create `src/middlewares/authMiddleware.js` to validate active user sessions.
+  - [x] Create `src/middlewares/adminOnly.js` to restrict CRUD operations to Admin roles.
+- [x] **1.4 Authentication MVC Module**:
+  - [x] Implement `src/models/auth_model.js`: User lookup by username.
+  - [x] Implement `src/controllers/auth_controller.js`: Login validation, password comparison, session establishment, and logout.
+  - [x] Implement `src/routes/auth_routes.js`: Bind `/api/auth/login`, `/api/auth/logout`, and `/api/auth/me`.
 
 ---
 
