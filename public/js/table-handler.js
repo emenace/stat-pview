@@ -106,8 +106,8 @@ export function renderTable(containerId, columns, records) {
     movableColumns: true,
     placeholder: '<div class="text-center py-8 text-slate-400"><p class="text-lg">No data records found</p><p class="text-sm">Add records in the Admin panel to display data here.</p></div>',
     headerSortElement: function(column, dir) {
-      if (dir === 'asc') return '<span class="ml-1 text-indigo-400">▲</span>';
-      if (dir === 'desc') return '<span class="ml-1 text-indigo-400">▼</span>';
+      if (dir === 'asc') return '<span class="ml-1 text-emerald-600 dark:text-emerald-400">▲</span>';
+      if (dir === 'desc') return '<span class="ml-1 text-emerald-600 dark:text-emerald-400">▼</span>';
       return '<span class="ml-1 text-slate-400">⇅</span>';
     },
   });
