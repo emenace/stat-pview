@@ -141,3 +141,7 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+# SQLite Database files (keep gitkeep, ignore actual databases)
+data/*.sqlite*
+!data/.gitkeep

@@ -26,8 +26,9 @@ export function getChartConfig(req, res) {
 
     // Extract chart-ready data using json_extract
     let chartData = [];
-    if (config.x_axis_column && config.y_axis_column) {
-      chartData = extractChartData(categoryId, config.x_axis_column, config.y_axis_column);
+    if (config.y_axis_column) {
+      const xCol = config.x_axis_column || config.y_axis_column;
+      chartData = extractChartData(categoryId, xCol, config.y_axis_column);
     }
 
     return res.status(200).json({

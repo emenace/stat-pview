@@ -39,22 +39,37 @@ git clone https://github.com/emenace/stat-pview.git
 npm install
 ```
 
-### 2. Development Server
-Start the local server in development mode (with auto-reloading if nodemon is configured):
+### 2. Running the Application
+
+The application supports separate environments for development (with dummy data) and production (with clean setup and secure credentials).
+
+#### A. Development Mode (Default)
+In development, a dummy database is automatically created and seeded with realistic statistical datasets (Public Transit Ridership and Education Funding Allocation) for demonstration purposes.
 ```bash
 npm run dev
 ```
-By default, the application will be accessible at:
-👉 **http://localhost:3000**
+* **Database Location**: `data/stat-pview-dummy.sqlite` (automatically created and git-ignored).
+* **Environment**: `NODE_ENV=development`.
+* **Default Seeding Credentials**:
+  * **Administrator**: `admin` / `admin123`
+  * **Standard User / Viewer**: `user` / `user123`
 
-### 3. Default Login Credentials
-Upon initial database seeding, the system creates default accounts:
-* **Administrator**:
-  * **Username**: `admin`
-  * **Password**: `admin123` *(Please change upon first deployment!)*
-* **Standard User / Viewer**:
-  * **Username**: `user`
-  * **Password**: `user123`
+#### B. Production Mode
+In production, a clean database is initialized. Real administrator and viewer credentials are set via environment variables. Dummy datasets are NOT seeded.
+```bash
+npm run start:prod
+# or:
+npm start
+```
+* **Database Location**: `data/stat-pview-prod.sqlite` (git-ignored).
+* **Environment**: `NODE_ENV=production`.
+* **Configuration**: Set environment variables in a `.env` file (e.g. `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `USER_USERNAME`, `USER_PASSWORD`, `SESSION_SECRET`).
+
+### 3. Running Automated API Tests
+A comprehensive test script is included to test all backend MVC layers, custom column schema validations, session handlers, and chart aggregations:
+```bash
+npm run test:api
+```
 
 ---
 
