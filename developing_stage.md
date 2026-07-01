@@ -70,20 +70,20 @@ As developers or AI agents complete each task, change the markdown checkbox from
 ## Stage 3: Dynamic Data Records & Chart Config (Backend Engine)
 *Goal: Implement the core JSON extraction engine for data records and visualization configuration models.*
 
-- [ ] **3.1 Dynamic Data Records Module (JSON Storage)**:
-  - [ ] Implement `src/models/record_model.js`:
-    - [ ] Insert/Update queries utilizing SQLite `json_object()` and `json_valid()` constraints.
-    - [ ] Dynamic select queries utilizing `json_extract(data, '$.field_name')` for sorting and filtering.
-  - [ ] Implement `src/controllers/record_controller.js`:
-    - [ ] Validate incoming JSON data against the category's `custom_columns` definition before saving.
-    - [ ] Implement pagination (`page`, `limit`) and keyword search within JSON payloads.
-  - [ ] Implement `src/routes/record_routes.js`: Bind `/api/records/:category_id` and CRUD routes.
-- [ ] **3.2 Chart Configuration Module**:
-  - [ ] Implement `src/models/chart_model.js`: Upsert and query chart settings (`chart_type`, X/Y axis column mappings, color palettes).
-  - [ ] Implement `src/controllers/chart_controller.js` and `src/routes/chart_routes.js`: Bind `/api/charts/:category_id`.
-- [ ] **3.3 End-to-End Backend Verification (Stage 3 Checkpoint)**:
-  - [ ] Seed test data records with sample JSON data and verify sub-second retrieval.
-  - [ ] Verify SQL queries correctly extract numeric values for chart aggregation.
+- [x] **3.1 Dynamic Data Records Module (JSON Storage)**:
+  - [x] Implement `src/models/record_model.js`:
+    - [x] Insert/Update queries utilizing SQLite `json_object()` and `json_valid()` constraints.
+    - [x] Dynamic select queries utilizing `json_extract(data, '$.field_name')` for sorting and filtering.
+  - [x] Implement `src/controllers/record_controller.js`:
+    - [x] Validate incoming JSON data against the category's `custom_columns` definition before saving.
+    - [x] Implement pagination (`page`, `limit`) and keyword search within JSON payloads.
+  - [x] Implement `src/routes/record_routes.js`: Bind `/api/records/:category_id` and CRUD routes.
+- [x] **3.2 Chart Configuration Module**:
+  - [x] Implement `src/models/chart_model.js`: Upsert and query chart settings (`chart_type`, X/Y axis column mappings, color palettes).
+  - [x] Implement `src/controllers/chart_controller.js` and `src/routes/chart_routes.js`: Bind `/api/charts/:category_id`.
+- [x] **3.3 End-to-End Backend Verification (Stage 3 Checkpoint)**:
+  - [x] Seed test data records with sample JSON data and verify sub-second retrieval.
+  - [x] Verify SQL queries correctly extract numeric values for chart aggregation.
 
 ---
 

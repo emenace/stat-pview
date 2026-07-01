@@ -9,6 +9,8 @@ import { initDatabase } from './config/database.js';
 import authRoutes from './routes/auth_routes.js';
 import categoryRoutes from './routes/category_routes.js';
 import columnRoutes from './routes/column_routes.js';
+import recordRoutes from './routes/record_routes.js';
+import chartRoutes from './routes/chart_routes.js';
 
 dotenv.config();
 
@@ -49,6 +51,8 @@ app.use(express.static(path.join(__dirname, '../public')));
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/columns', columnRoutes);
+app.use('/api/records', recordRoutes);
+app.use('/api/charts', chartRoutes);
 
 // Health Check API Endpoint
 app.get('/api/health', (req, res) => {
