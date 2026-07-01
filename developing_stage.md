@@ -53,17 +53,17 @@ As developers or AI agents complete each task, change the markdown checkbox from
 ## Stage 2: Category & Custom Schema Builder (Backend CRUD)
 *Goal: Build the backend API to manage statistical categories and dynamically define EAV custom table columns.*
 
-- [ ] **2.1 Category Management Module**:
-  - [ ] Implement `src/models/category_model.js`: SQL queries for Category CRUD.
-  - [ ] Implement `src/controllers/category_controller.js`: Request validation and JSON response structuring.
-  - [ ] Implement `src/routes/category_routes.js`: Bind `/api/categories` endpoints with Admin role middleware on `POST`, `PUT`, `DELETE`.
-- [ ] **2.2 Custom Schema / Columns Module**:
-  - [ ] Implement `src/models/column_model.js`: SQL queries to manage schema rules (`custom_columns`).
-  - [ ] Implement `src/controllers/column_controller.js`: Validate `data_type` inputs (`text`, `number`, `date`, `boolean`, `select`) and manage sort ordering.
-  - [ ] Implement `src/routes/column_routes.js`: Bind `/api/columns/:category_id` and CRUD routes.
-- [ ] **2.3 API Verification (Stage 2 Checkpoint)**:
-  - [ ] Verify creating a test category returns a valid `id`.
-  - [ ] Verify adding multiple custom columns with different data types binds correctly to the category.
+- [x] **2.1 Category Management Module**:
+  - [x] Implement `src/models/category_model.js`: SQL queries for Category CRUD.
+  - [x] Implement `src/controllers/category_controller.js`: Request validation and JSON response structuring.
+  - [x] Implement `src/routes/category_routes.js`: Bind `/api/categories` endpoints with Admin role middleware on `POST`, `PUT`, `DELETE`.
+- [x] **2.2 Custom Schema / Columns Module**:
+  - [x] Implement `src/models/column_model.js`: SQL queries to manage schema rules (`custom_columns`).
+  - [x] Implement `src/controllers/column_controller.js`: Validate `data_type` inputs (`text`, `number`, `date`, `boolean`, `select`) and manage sort ordering.
+  - [x] Implement `src/routes/column_routes.js`: Bind `/api/columns/:category_id` and CRUD routes.
+- [x] **2.3 API Verification (Stage 2 Checkpoint)**:
+  - [x] Verify creating a test category returns a valid `id`.
+  - [x] Verify adding multiple custom columns with different data types binds correctly to the category.
 
 ---
 
