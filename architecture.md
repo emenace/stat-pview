@@ -87,31 +87,35 @@ sequenceDiagram
 
 ---
 
-## 3. Dynamic Schema Architecture (Hybrid Relational + JSON)
+## 3. Dynamic Schema Architecture (Two-Tier Hybrid Relational + JSON)
 
-A major technical challenge in dynamic dashboard builders is enabling custom columns and rows without executing database schema DDL migrations (`ALTER TABLE ADD COLUMN`), which can lock tables and degrade performance.
+A major technical challenge in dynamic dashboard builders is enabling custom columns and rows without executing database schema DDL migrations (`ALTER TABLE ADD COLUMN`), which can lock tables and degrade performance. We solve this by structuring data in a **two-tier hierarchy (Category → Sub-Category)** where custom columns and JSON records belong to a specific Sub-Category:
 
 ### How Our EAV / JSON Approach Works:
-1. **Schema Definition (`custom_columns` table)**:
-   * When an Admin adds a column (e.g., "Monthly Revenue" of type `number`), a row is inserted into `custom_columns` with `category_id`, `column_name = 'monthly_revenue'`, and `data_type = 'number'`.
-2. **Data Storage (`data_records` table)**:
-   * When data rows are entered, values are stored as a single JSON object inside the `data` text column of `data_records`:
+1. **Two-Tier Hierarchy (`categories` & `sub_categories` tables)**:
+   * Top-level categories (e.g., *Data Rumah Ibadah*) contain only an icon and title.
+   * Underneath, sub-categories (e.g., *Data Masjid*, *Data Gereja*) hold the actual data definitions.
+2. **Schema Definition (`custom_columns` table)**:
+   * When an Admin adds a column (e.g., "Nama Masjid" of type `text`), a row is inserted into `custom_columns` with `sub_category_id`, `column_name = 'nama_masjid'`, and `data_type = 'text'`.
+3. **Data Storage (`data_records` table)**:
+   * When data rows are entered, values are stored as a single JSON object inside the `data` text column of `data_records`, linked to `sub_category_id`:
      ```json
      {
-       "month": "January 2026",
-       "monthly_revenue": 45000,
-       "is_audited": true
+       "nama_masjid": "Masjid Taqwa Metro",
+       "kecamatan": "Metro Pusat",
+       "jamaah": 500
      }
      ```
-3. **Query & Extraction**:
+4. **Query & Extraction**:
    * SQLite provides high-performance JSON functions (`json_extract()`, `json_tree()`, and `json_group_array()`).
-   * When rendering a chart that maps X-axis to `month` and Y-axis to `monthly_revenue`, the backend executes:
+   * When rendering a chart or table for a sub-category, the backend executes:
      ```sql
      SELECT 
-       json_extract(data, '$.month') AS x_label,
-       json_extract(data, '$.monthly_revenue') AS y_value
+       id,
+       json_extract(data, '$.nama_masjid') AS label,
+       json_extract(data, '$.jamaah') AS value
      FROM data_records
-     WHERE category_id = ?
+     WHERE sub_category_id = ?
      ORDER BY id ASC;
      ```
 
@@ -124,15 +128,17 @@ The frontend is built using clean, modular ES6 JavaScript (`type="module"`) with
 
 | Module | Responsibility |
 |--------|---------------|
-| `api-service.js` | Modular `fetch()` wrappers for all API endpoints, global error handling, and toast notification system |
-| `chart-handler.js` | Dynamic Chart.js renderer supporting `bar`, `line`, `pie`, `doughnut`, `area` with named gradient palettes (`default`, `indigo`, `emerald`, `rose`) |
+| `api-service.js` | Modular `fetch()` wrappers for all API endpoints (including subcategory CRUD), global error handling, and toast notification system |
+| `chart-handler.js` | Dynamic Chart.js renderer supporting `bar`, `line`, `pie`, `doughnut`, `area` with named gradient palettes (`default`, `indigo`, `emerald`, `rose`) linked to `sub_category_id` |
 | `table-handler.js` | Dynamic Tabulator.js grid builder — auto-translates `custom_columns` into formatted column definitions with number/date/boolean formatting |
-| `dashboard.js` | Orchestrator — dark mode, auth state check, category tab selection, parallel data loading, empty-state handling |
+| `dashboard.js` | Orchestrator — dark mode, auth state check, 3x3 category grid landing, horizontal sub-category tab bar selection, parallel data loading, empty-state handling |
+| `admin-categories.js` | Admin manager for clean category cards and a modal/drawer interface to manage sub-categories |
+| `admin-schema.js` | Admin cascaded schema builder with synchronized Category and Sub-Category selectors |
 
 ### 4.2 Chart & Table Integration Flow
 ```mermaid
 flowchart LR
-    A[User Selects Category Tab] -->|Parallel Fetch| B(GET /api/columns/:id)
+    A[User Selects Sub-Category Tab] -->|Parallel Fetch| B(GET /api/columns/:id)
     A -->|Parallel Fetch| C(GET /api/records/:id)
     A -->|Parallel Fetch| D(GET /api/charts/:id)
     B --> E[Build Tabulator Column Defs]

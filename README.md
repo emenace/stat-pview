@@ -6,11 +6,12 @@
 
 ## 🌟 Key Features
 
-* **Dynamic Schema Builder (No DDL Migrations)**: Built on a hybrid Relational + JSON SQLite architecture. Administrators can define custom table columns (Text, Number, Date, Boolean, Select) and manage data rows on the fly without database migrations.
-* **Role-Based Session Authentication**: Secure login system with role separation between **Administrators** (who manage categories, custom schemas, data rows, and charts) and **Users / Public Viewers** (who explore data dashboards).
-* **Interactive Visualizations**: Powered by **Chart.js** for responsive Bar, Line, Pie, Doughnut, and Area charts with custom X/Y column mappings.
-* **Dynamic Data Grid**: Powered by **Tabulator.js** for rich client-side sorting, searching, and pagination of custom data records.
-* **Premium UI/UX**: Designed with vibrant Tailwind CSS palettes, dark/light mode aesthetics, glassmorphic accents, and micro-animations.
+* **Two-Tier Architecture (Category → Sub-Category)**: Clean 3x3 category grid landing pages (Icon + Title only) that transition to sub-category tabs for organized data exploration.
+* **Dynamic Schema Builder (No DDL Migrations)**: Built on a hybrid Relational + JSON SQLite architecture. Administrators select Category and Sub-Category via cascaded selectors to define custom table columns (Text, Number, Date, Boolean, Select) and manage data rows on the fly without database migrations.
+* **Role-Based Session Authentication**: Secure login system with role separation between **Administrators** (who manage categories, sub-categories, custom schemas, data rows, and charts) and **Users / Public Viewers** (who explore data dashboards).
+* **Interactive Visualizations**: Powered by **Chart.js** for responsive Bar, Line, Pie, Doughnut, and Area charts linked to sub-categories with custom X/Y column mappings.
+* **Dynamic Data Grid & Exports**: Powered by **Tabulator.js** for rich client-side sorting, searching, pagination, and export tools (Copy, CSV, Excel, PDF, Print) of custom data records.
+* **Premium UI/UX**: Designed with vibrant Tailwind CSS palettes (Kemenag Green emerald accents), dark/light mode aesthetics, glassmorphic accents, and micro-animations.
 
 ---
 

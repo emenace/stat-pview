@@ -1,29 +1,29 @@
 import {
-  getRecordsByCategory,
+  getRecordsBySubCategory,
   getRecordById,
   createRecord,
   updateRecord,
   deleteRecord
 } from '../models/record_model.js';
-import { getCategoryById } from '../models/category_model.js';
-import { getColumnsByCategory } from '../models/column_model.js';
+import { getSubCategoryById } from '../models/subcategory_model.js';
+import { getColumnsBySubCategory } from '../models/column_model.js';
 
 /**
- * GET /api/records/:category_id — List paginated data records (Public)
+ * GET /api/records/:sub_category_id — List paginated data records (Public)
  */
 export function listRecords(req, res) {
   try {
-    const categoryId = req.params.category_id;
-    const category = getCategoryById(categoryId);
-    if (!category) {
-      return res.status(404).json({ success: false, error: 'Category not found.' });
+    const subCategoryId = req.params.sub_category_id || req.params.category_id;
+    const subCat = getSubCategoryById(subCategoryId);
+    if (!subCat) {
+      return res.status(404).json({ success: false, error: 'Sub-category not found.' });
     }
 
     const page = Math.max(1, parseInt(req.query.page) || 1);
     const limit = Math.min(200, Math.max(1, parseInt(req.query.limit) || 50));
     const search = req.query.search || '';
 
-    const result = getRecordsByCategory(categoryId, { page, limit, search });
+    const result = getRecordsBySubCategory(subCategoryId, { page, limit, search });
     return res.status(200).json({
       success: true,
       pagination: result.pagination,
@@ -53,27 +53,28 @@ export function getRecord(req, res) {
 
 /**
  * POST /api/records — Create a new data record (Admin Only)
- * Validates incoming JSON data against the category's custom_columns definition
+ * Validates incoming JSON data against the sub-category's custom_columns definition
  */
 export function addRecord(req, res) {
-  const { category_id, data } = req.body || {};
+  const { sub_category_id, category_id, data } = req.body || {};
+  const targetId = sub_category_id || category_id;
 
-  if (!category_id) {
-    return res.status(400).json({ success: false, error: 'category_id is required.' });
+  if (!targetId) {
+    return res.status(400).json({ success: false, error: 'sub_category_id is required.' });
   }
   if (!data || typeof data !== 'object' || Array.isArray(data)) {
     return res.status(400).json({ success: false, error: 'data must be a valid JSON object.' });
   }
 
   try {
-    // Verify category exists
-    const category = getCategoryById(category_id);
-    if (!category) {
-      return res.status(404).json({ success: false, error: 'Category not found.' });
+    // Verify sub-category exists
+    const subCat = getSubCategoryById(targetId);
+    if (!subCat) {
+      return res.status(404).json({ success: false, error: 'Sub-category not found.' });
     }
 
     // Validate data against custom_columns schema
-    const columns = getColumnsByCategory(category_id);
+    const columns = getColumnsBySubCategory(targetId);
     const validationErrors = validateDataAgainstSchema(data, columns);
     if (validationErrors.length > 0) {
       return res.status(400).json({
@@ -91,7 +92,7 @@ export function addRecord(req, res) {
       }
     });
 
-    const record = createRecord(category_id, filteredData);
+    const record = createRecord(targetId, filteredData);
     return res.status(201).json({ success: true, data: record });
   } catch (err) {
     console.error('[RecordController] Create Error:', err);
@@ -116,7 +117,7 @@ export function editRecord(req, res) {
     }
 
     // Validate data against custom_columns schema
-    const columns = getColumnsByCategory(existing.category_id);
+    const columns = getColumnsBySubCategory(existing.sub_category_id);
     const validationErrors = validateDataAgainstSchema(data, columns);
     if (validationErrors.length > 0) {
       return res.status(400).json({
@@ -168,9 +169,9 @@ export function removeRecord(req, res) {
 }
 
 /**
- * Validate a data object against the category's custom_columns definition
+ * Validate a data object against the sub-category's custom_columns definition
  * @param {object} data - The incoming JSON data
- * @param {Array} columns - The category's custom_columns definitions
+ * @param {Array} columns - The sub-category's custom_columns definitions
  * @returns {Array} Array of validation error strings (empty if valid)
  */
 function validateDataAgainstSchema(data, columns) {

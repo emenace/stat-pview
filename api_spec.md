@@ -69,12 +69,12 @@ This specification documents the REST API endpoints for **Statistic Public View*
 
 ---
 
-## 2. Category Management (CRUD)
+## 2. Category & Sub-Category Management (CRUD)
 
 ### 2.1 List All Categories
 * **Endpoint**: `GET /api/categories`
 * **Access**: Public
-* **Description**: Returns all statistical datasets/categories available for viewing.
+* **Description**: Returns all top-level statistical categories (Icon + Title only) along with their nested sub-categories.
 * **Response (200 OK)**:
   ```json
   {
@@ -82,11 +82,13 @@ This specification documents the REST API endpoints for **Statistic Public View*
     "data": [
       {
         "id": 1,
-        "name": "Tempat Ibadah Kota Metro",
-        "description": "Statistik jumlah tempat ibadah berdasarkan jenis dan kecamatan",
+        "name": "Data Rumah Ibadah",
         "icon": "building",
         "color_theme": "emerald",
-        "created_at": "2026-07-01 10:00:00"
+        "created_at": "2026-07-01 10:00:00",
+        "sub_categories": [
+          { "id": 1, "category_id": 1, "name": "Data Masjid", "sort_order": 10 }
+        ]
       }
     ]
   }
@@ -98,8 +100,7 @@ This specification documents the REST API endpoints for **Statistic Public View*
 * **Request Body**:
   ```json
   {
-    "name": "Tanah Wakaf Kota Metro",
-    "description": "Data aset tanah wakaf berdasarkan kecamatan dan peruntukan",
+    "name": "Tanah Wakaf",
     "icon": "map",
     "color_theme": "emerald"
   }
@@ -107,16 +108,22 @@ This specification documents the REST API endpoints for **Statistic Public View*
 
 ### 2.3 Update & Delete Category
 * **Update Endpoint**: `PUT /api/categories/:id` (Admin Only)
-* **Delete Endpoint**: `DELETE /api/categories/:id` (Admin Only)
+* **Delete Endpoint**: `DELETE /api/categories/:id` (Admin Only - Cascades to all sub-categories and data)
+
+### 2.4 Sub-Category Endpoints
+* **List Sub-Categories**: `GET /api/subcategories/:category_id` (Public)
+* **Create Sub-Category**: `POST /api/subcategories` (Admin Only) - Body: `{ "category_id": 1, "name": "Data Mushollah", "sort_order": 20 }`
+* **Update Sub-Category**: `PUT /api/subcategories/:id` (Admin Only)
+* **Delete Sub-Category**: `DELETE /api/subcategories/:id` (Admin Only - Cascades to columns, records, and chart configs)
 
 ---
 
 ## 3. Custom Schema Builder (Columns)
 
-### 3.1 Get Category Schema
-* **Endpoint**: `GET /api/columns/:category_id`
+### 3.1 Get Sub-Category Schema
+* **Endpoint**: `GET /api/columns/:category_id` (Note: `:category_id` represents `sub_category_id` in URL routing)
 * **Access**: Public
-* **Description**: Returns the ordered list of custom column definitions for a given category.
+* **Description**: Returns the ordered list of custom column definitions for a given sub-category.
 * **Response (200 OK)**:
   ```json
   {
@@ -124,17 +131,17 @@ This specification documents the REST API endpoints for **Statistic Public View*
     "data": [
       {
         "id": 1,
-        "category_id": 1,
-        "column_name": "jenis",
-        "column_label": "Jenis Tempat Ibadah",
-        "data_type": "select",
+        "sub_category_id": 1,
+        "column_name": "nama_masjid",
+        "column_label": "Nama Masjid",
+        "data_type": "text",
         "is_required": 1,
         "sort_order": 10
       },
       {
         "id": 2,
-        "category_id": 1,
-        "column_name": "jumlah",
+        "sub_category_id": 1,
+        "column_name": "jamaah",
         "column_label": "Jumlah Jamaah",
         "data_type": "number",
         "is_required": 1,
@@ -150,7 +157,7 @@ This specification documents the REST API endpoints for **Statistic Public View*
 * **Request Body**:
   ```json
   {
-    "category_id": 1,
+    "sub_category_id": 1,
     "column_name": "status",
     "column_label": "Status Tanah",
     "data_type": "text",
@@ -167,8 +174,8 @@ This specification documents the REST API endpoints for **Statistic Public View*
 
 ## 4. Dynamic Data Records (EAV / JSON Rows)
 
-### 4.1 List Data Records for Category
-* **Endpoint**: `GET /api/records/:category_id`
+### 4.1 List Data Records for Sub-Category
+* **Endpoint**: `GET /api/records/:category_id` (Note: `:category_id` represents `sub_category_id` in URL routing)
 * **Access**: Public
 * **Query Parameters**:
   * `page` (optional, default: 1)
@@ -182,12 +189,11 @@ This specification documents the REST API endpoints for **Statistic Public View*
     "data": [
       {
         "id": 101,
-        "category_id": 1,
+        "sub_category_id": 1,
         "data": {
-          "jenis": "Masjid",
+          "nama_masjid": "Masjid Taqwa Metro",
           "kecamatan": "Metro Pusat",
-          "jumlah": 1250,
-          "status": "Wakaf"
+          "jamaah": 500
         },
         "created_at": "2026-07-01 10:15:00"
       }
@@ -201,12 +207,11 @@ This specification documents the REST API endpoints for **Statistic Public View*
 * **Request Body**:
   ```json
   {
-    "category_id": 1,
+    "sub_category_id": 1,
     "data": {
-      "jenis": "Gereja",
+      "nama_masjid": "Masjid Al-Muhajirin",
       "kecamatan": "Metro Timur",
-      "jumlah": 310,
-      "status": "Sertifikat Sendiri"
+      "jamaah": 310
     }
   }
   ```
@@ -220,9 +225,9 @@ This specification documents the REST API endpoints for **Statistic Public View*
 ## 5. Chart Visualization Configuration
 
 ### 5.1 Get Chart Configuration
-* **Endpoint**: `GET /api/charts/:category_id`
+* **Endpoint**: `GET /api/charts/:category_id` (Note: `:category_id` represents `sub_category_id` in URL routing)
 * **Access**: Public
-* **Description**: Returns the chart settings for rendering Chart.js visualizations.
+* **Description**: Returns the chart settings for rendering Chart.js visualizations for a sub-category.
 * **Response (200 OK)**:
   ```json
   {
@@ -230,24 +235,24 @@ This specification documents the REST API endpoints for **Statistic Public View*
     "data": {
       "config": {
         "id": 1,
-        "category_id": 1,
+        "sub_category_id": 1,
         "chart_type": "bar",
-        "x_axis_column": "kecamatan",
-        "y_axis_column": "jumlah",
+        "x_axis_column": "nama_masjid",
+        "y_axis_column": "jamaah",
         "group_by_column": null,
         "palette": "emerald",
-        "title": "Jumlah Jamaah Tempat Ibadah per Kecamatan"
+        "title": "Jumlah Jamaah Masjid di Kota Metro"
       },
       "chartData": {
-        "labels": ["Metro Pusat", "Metro Timur", "Metro Barat"],
-        "values": [1250, 980, 850]
+        "labels": ["Masjid Taqwa Metro", "Masjid Al-Muhajirin"],
+        "values": [500, 310]
       }
     }
   }
   ```
 
 ### 5.2 Save or Update Chart Configuration
-* **Endpoint**: `POST /api/charts/:category_id` (Upsert behavior)
+* **Endpoint**: `POST /api/charts/:category_id` (Upsert behavior, `:category_id` represents `sub_category_id`)
 * **Access**: Admin Only
 * **Request Body**:
   ```json

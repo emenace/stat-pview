@@ -247,10 +247,14 @@
         <div class="mt-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h2 id="active-category-title" class="text-2xl font-bold text-slate-900 dark:text-white"></h2>
-            <p id="active-category-desc" class="mt-1 text-sm text-slate-500 dark:text-slate-400"></p>
           </div>
           <span id="record-count"
             class="self-start sm:self-center text-xs font-semibold px-3 py-1.5 rounded-full bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800"></span>
+        </div>
+
+        <!-- Sub-Category Tabs Bar -->
+        <div id="subcategory-tabs-container" class="mt-6 pt-4 border-t border-slate-200/60 dark:border-slate-800/60 flex items-center gap-2 overflow-x-auto">
+          <!-- Sub-category tab buttons will be injected here -->
         </div>
       </div>
 
@@ -291,7 +295,7 @@
       <section id="table-section" class="hidden fade-in">
         <div
           class="backdrop-blur-md bg-white/90 dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl shadow-lg p-5 sm:p-6">
-          <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/50">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800/50">
             <div class="flex items-center gap-2">
               <span class="p-2 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2"
@@ -302,8 +306,15 @@
               </span>
               <h3 class="text-base font-bold text-slate-800 dark:text-slate-200">Interactive Data Grid</h3>
             </div>
-            <span class="text-xs text-slate-500 dark:text-slate-400 italic">Click column headers to sort or
-              filter</span>
+            
+            <!-- Placeholder Export Buttons -->
+            <div class="flex items-center gap-1.5 flex-wrap">
+              <button type="button" class="btn-export-placeholder px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 transition-all duration-150">Copy</button>
+              <button type="button" class="btn-export-placeholder px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 transition-all duration-150">CSV</button>
+              <button type="button" class="btn-export-placeholder px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 transition-all duration-150">Excel</button>
+              <button type="button" class="btn-export-placeholder px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 transition-all duration-150">PDF</button>
+              <button type="button" class="btn-export-placeholder px-3 py-1.5 text-xs font-semibold rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400 border border-slate-200 dark:border-slate-700 transition-all duration-150">Print</button>
+            </div>
           </div>
           <div id="stats-table" class="rounded-xl overflow-hidden"></div>
         </div>

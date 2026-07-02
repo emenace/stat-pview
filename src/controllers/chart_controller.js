@@ -1,26 +1,26 @@
-import { getChartConfigByCategory, upsertChartConfig } from '../models/chart_model.js';
-import { getCategoryById } from '../models/category_model.js';
+import { getChartConfigBySubCategory, upsertChartConfig } from '../models/chart_model.js';
+import { getSubCategoryById } from '../models/subcategory_model.js';
 import { extractChartData } from '../models/record_model.js';
 
 const VALID_CHART_TYPES = ['bar', 'line', 'pie', 'doughnut', 'area'];
 
 /**
- * GET /api/charts/:category_id — Get chart config and pre-extracted data (Public)
+ * GET /api/charts/:sub_category_id — Get chart config and pre-extracted data (Public)
  */
 export function getChartConfig(req, res) {
   try {
-    const categoryId = req.params.category_id;
-    const category = getCategoryById(categoryId);
-    if (!category) {
-      return res.status(404).json({ success: false, error: 'Category not found.' });
+    const subCategoryId = req.params.sub_category_id || req.params.category_id;
+    const subCat = getSubCategoryById(subCategoryId);
+    if (!subCat) {
+      return res.status(404).json({ success: false, error: 'Sub-category not found.' });
     }
 
-    const config = getChartConfigByCategory(categoryId);
+    const config = getChartConfigBySubCategory(subCategoryId);
     if (!config) {
       return res.status(200).json({
         success: true,
         data: null,
-        message: 'No chart configuration set for this category.'
+        message: 'No chart configuration set for this sub-category.'
       });
     }
 
@@ -28,7 +28,7 @@ export function getChartConfig(req, res) {
     let chartData = [];
     if (config.y_axis_column) {
       const xCol = config.x_axis_column || config.y_axis_column;
-      chartData = extractChartData(categoryId, xCol, config.y_axis_column);
+      chartData = extractChartData(subCategoryId, xCol, config.y_axis_column);
     }
 
     return res.status(200).json({
@@ -48,10 +48,10 @@ export function getChartConfig(req, res) {
 }
 
 /**
- * POST /api/charts/:category_id — Save or update chart config (Admin Only, Upsert)
+ * POST /api/charts/:sub_category_id — Save or update chart config (Admin Only, Upsert)
  */
 export function saveChartConfig(req, res) {
-  const categoryId = req.params.category_id;
+  const subCategoryId = req.params.sub_category_id || req.params.category_id;
   const { chart_type, x_axis_column, y_axis_column, group_by_column, palette, title } = req.body || {};
 
   // Validate chart type if provided
@@ -63,17 +63,17 @@ export function saveChartConfig(req, res) {
   }
 
   try {
-    const category = getCategoryById(categoryId);
-    if (!category) {
-      return res.status(404).json({ success: false, error: 'Category not found.' });
+    const subCat = getSubCategoryById(subCategoryId);
+    if (!subCat) {
+      return res.status(404).json({ success: false, error: 'Sub-category not found.' });
     }
 
-    const config = upsertChartConfig(categoryId, {
+    const config = upsertChartConfig(subCategoryId, {
       chart_type: chart_type || 'bar',
       x_axis_column: x_axis_column || null,
       y_axis_column: y_axis_column || null,
       group_by_column: group_by_column || null,
-      palette: palette || 'default',
+      palette: palette || 'emerald',
       title: title || null
     });
 

@@ -9,6 +9,7 @@ import { renderTable, destroyTable } from './table-handler.js';
 
 let categories = [];
 let activeCategoryId = null;
+let activeSubCategoryId = null;
 
 // ── Initialization ────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async () => {
@@ -35,8 +36,8 @@ function initDarkMode() {
       localStorage.setItem('theme', html.classList.contains('dark') ? 'dark' : 'light');
       updateDarkModeIcon();
       // Re-render active chart/table with new theme colors
-      if (activeCategoryId && !document.getElementById('statistics-view-section').classList.contains('hidden')) {
-        loadCategoryData(activeCategoryId);
+      if (activeSubCategoryId && !document.getElementById('statistics-view-section').classList.contains('hidden')) {
+        loadSubCategoryData(activeSubCategoryId);
       }
     });
     updateDarkModeIcon();
@@ -69,10 +70,18 @@ function initNavListeners() {
       showCategoryGridView();
     });
   }
+
+  const exportBtns = document.querySelectorAll('.btn-export-placeholder');
+  exportBtns.forEach((btn) => {
+    btn.addEventListener('click', () => {
+      showToast(`Export (${btn.textContent.trim()}) is a placeholder without logic.`, 'info');
+    });
+  });
 }
 
 function showCategoryGridView() {
   activeCategoryId = null;
+  activeSubCategoryId = null;
   const gridSection = document.getElementById('category-grid-section');
   const statsSection = document.getElementById('statistics-view-section');
 
@@ -142,6 +151,12 @@ function renderCategoryGridCards() {
     'bus': '<path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />',
     'academic-cap': '<path stroke-linecap="round" stroke-linejoin="round" d="M4.26 10.147a60.436 60.436 0 00-.491 6.347A48.627 48.627 0 0112 20.904a48.627 48.627 0 018.232-4.41 60.46 60.46 0 00-.491-6.347m-15.482 0a50.57 50.57 0 00-2.658-.813A59.905 59.905 0 0112 3.493a59.902 59.902 0 0110.399 5.84c-.896.248-1.783.52-2.658.814m-15.482 0A50.697 50.697 0 0112 13.489a50.702 50.702 0 017.74-3.342M6.75 15a.75.75 0 100-1.5.75.75 0 000 1.5zm0 0v-3.675A55.378 55.378 0 0112 8.443m-7.007 11.55A5.981 5.981 0 006.75 15.75v-1.5" />',
     'chart-bar': '<path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />',
+    'users': '<path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />',
+    'building-office': '<path stroke-linecap="round" stroke-linejoin="round" d="M3.75 21h16.5M4.5 3h15M5.25 3v18m13.5-18v18M9 6.75h1.5m-1.5 3h1.5m-1.5 3h1.5m3-6H15m-1.5 3H15m-1.5 3H15M9 21v-3.375c0-.621.504-1.125 1.125-1.125h3.75c.621 0 1.125.504 1.125 1.125V21" />',
+    'book-open': '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6.042A8.967 8.967 0 006 3.75c-1.052 0-2.062.18-3 .512v14.25A8.987 8.987 0 016 18c2.305 0 4.408.867 6 2.292m0-14.25a8.966 8.966 0 016-2.292c1.052 0 2.062.18 3 .512v14.25A8.987 8.987 0 0018 18a8.967 8.967 0 00-6 2.292m0-14.25v14.25" />',
+    'globe-alt': '<path stroke-linecap="round" stroke-linejoin="round" d="M12 21a9.004 9.004 0 008.716-6.747M12 21a9.004 9.004 0 01-8.716-6.747M12 21c2.485 0 4.5-4.03 4.5-9S14.485 3 12 3m0 18c-2.485 0-4.5-4.03-4.5-9S9.515 3 12 3m0 0a8.997 8.997 0 017.843 4.582M12 3a8.997 8.997 0 00-7.843 4.582m15.686 0A11.953 11.953 0 0112 10.5c-2.998 0-5.74-1.1-7.843-2.918m15.686 0A8.959 8.959 0 0121 12c0 .778-.099 1.533-.284 2.253m0 0A17.919 17.919 0 0112 16.5c-3.162 0-6.133-.815-8.716-2.247m0 0A9.015 9.015 0 013 12c0-1.605.42-3.113 1.157-4.418" />',
+    'map-pin': '<path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />',
+    'briefcase': '<path stroke-linecap="round" stroke-linejoin="round" d="M20.25 14.15v4.25c0 1.094-.787 2.036-1.872 2.18-2.087.277-4.216.42-6.378.42s-4.291-.143-6.378-.42c-1.085-.144-1.872-1.086-1.872-2.18v-4.25m16.5 0a2.18 2.18 0 00.75-1.661V8.706c0-1.081-.768-2.015-1.837-2.175a48.114 48.114 0 00-3.413-.387m4.5 8.006c-.194.165-.42.295-.673.38A23.978 23.978 0 0112 15.75c-2.648 0-5.195-.429-7.577-1.22a2.016 2.016 0 01-.673-.38m0 0A2.18 2.18 0 013 12.489V8.706c0-1.081.768-2.015 1.837-2.175a48.111 48.111 0 013.413-.387m7.5 0V5.25A2.25 2.25 0 0013.5 3h-3a2.25 2.25 0 00-2.25 2.25v.894m7.5 0a48.667 48.667 0 00-7.5 0" />',
   };
 
   categories.forEach((cat) => {
@@ -149,6 +164,7 @@ function renderCategoryGridCards() {
     card.className = 'group relative bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/70 dark:border-slate-800/70 rounded-2xl p-6 shadow-sm hover:shadow-xl hover:border-emerald-500/50 dark:hover:border-emerald-500/50 transition-all duration-300 flex flex-col justify-between cursor-pointer transform hover:-translate-y-1.5';
 
     const iconSvg = icons[cat.icon] || icons['chart-bar'];
+    const subCount = cat.sub_categories ? cat.sub_categories.length : 0;
 
     card.innerHTML = `
       <div>
@@ -160,18 +176,15 @@ function renderCategoryGridCards() {
         <h3 class="text-xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-200 mb-2">
           ${cat.name}
         </h3>
-        <p class="text-sm text-slate-600 dark:text-slate-400 line-clamp-3 leading-relaxed">
-          ${cat.description || 'Interactive statistical data tables and visual analytics charts.'}
-        </p>
       </div>
       <div class="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between">
         <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 group-hover:underline flex items-center gap-1">
-          <span>Tampilkan Data  </span>
+          <span>Tampilkan Data</span>
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform">
             <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
           </svg>
         </span>
-        <span class="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium">Dataset</span>
+        <span class="text-xs px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 font-medium">${subCount} Sub-Kategori</span>
       </div>
     `;
 
@@ -184,25 +197,72 @@ function selectCategory(categoryId) {
   activeCategoryId = categoryId;
   showStatisticsView();
 
-  // Update header titles
+  // Update header title
   const cat = categories.find((c) => c.id === categoryId);
   const titleEl = document.getElementById('active-category-title');
-  const descEl = document.getElementById('active-category-desc');
   if (titleEl && cat) titleEl.textContent = cat.name;
-  if (descEl && cat) descEl.textContent = cat.description || '';
 
-  loadCategoryData(categoryId);
+  // Render sub-category tabs
+  renderSubCategoryTabs(cat?.sub_categories || []);
+}
+
+function renderSubCategoryTabs(subCategories) {
+  const container = document.getElementById('subcategory-tabs-container');
+  if (!container) return;
+  container.innerHTML = '';
+
+  if (subCategories.length === 0) {
+    container.innerHTML = `<span class="text-sm text-slate-400 dark:text-slate-500 italic">Tidak ada sub-kategori tersedia.</span>`;
+    showEmptyState();
+    destroyChart();
+    destroyTable();
+    return;
+  }
+
+  subCategories.forEach((sub, idx) => {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = `subcat-tab-btn px-4 py-2 text-sm font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap ${
+      idx === 0
+        ? 'bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20'
+        : 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-600'
+    }`;
+    btn.textContent = sub.name;
+    btn.dataset.id = sub.id;
+
+    btn.addEventListener('click', () => selectSubCategory(sub.id));
+    container.appendChild(btn);
+  });
+
+  // Automatically select the first sub-category
+  selectSubCategory(subCategories[0].id);
+}
+
+function selectSubCategory(subCategoryId) {
+  activeSubCategoryId = subCategoryId;
+
+  // Update button active styling
+  const buttons = document.querySelectorAll('.subcat-tab-btn');
+  buttons.forEach((btn) => {
+    if (parseInt(btn.dataset.id) === subCategoryId) {
+      btn.className = 'subcat-tab-btn px-4 py-2 text-sm font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap bg-emerald-600 text-white border-emerald-600 shadow-md shadow-emerald-600/20';
+    } else {
+      btn.className = 'subcat-tab-btn px-4 py-2 text-sm font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-emerald-400 dark:hover:border-emerald-600';
+    }
+  });
+
+  loadSubCategoryData(subCategoryId);
 }
 
 // ── Data Loading ──────────────────────────────────────
-async function loadCategoryData(categoryId) {
+async function loadSubCategoryData(subCategoryId) {
   showLoading(true);
 
   try {
     const [columnsResult, recordsResult, chartResult] = await Promise.all([
-      getColumns(categoryId),
-      getRecords(categoryId, 1, 200),
-      getChartConfig(categoryId),
+      getColumns(subCategoryId),
+      getRecords(subCategoryId, 1, 200),
+      getChartConfig(subCategoryId),
     ]);
 
     const columns = columnsResult.data || [];

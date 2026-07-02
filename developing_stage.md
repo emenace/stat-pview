@@ -120,20 +120,21 @@ As developers or AI agents complete each task, change the markdown checkbox from
 - [x] **5.2 Admin Dashboard Layout (`/public/admin.html`)**:
   - [x] Build Admin sidebar/navbar with tabbed management sections: *Categories*, *Schema Builder*, *Data Records*, and *Chart Config*.
   - [x] Add session verification check on page load; redirect unauthenticated users back to `login.html`.
-- [x] **5.3 Category Manager Modal & UI (`/public/js/admin-categories.js`)**:
-  - [x] Create interactive table listing all categories with Edit and Delete action buttons.
-  - [x] Build modal dialog form to create or update categories (Name, Description, Icon selector, Color Theme picker).
-- [x] **5.4 Custom Table Schema Builder UI (`/public/js/admin-schema.js`)**:
-  - [x] Build schema manager where Admins select a category and view its defined custom columns.
-  - [x] Build "Add / Edit Column" modal supporting data type selection (`text`, `number`, `date`, `boolean`, `select`), label input, required checkbox, and sort order number.
+- [x] **5.3 Category & Sub-Category Manager (`/public/js/admin-categories.js`)** *(Updated via Architecture Overhaul `@overhaul_stage.md`)*:
+  - [x] Create interactive table listing top-level categories (without description text) with Edit and Delete action buttons.
+  - [x] Build modal dialog form to create or update top-level categories (Name, Icon selector, Color Theme picker).
+  - [x] Add "Kelola Sub-Kategori" modal/drawer allowing Admins to list, create, update, and delete sub-categories with clean empty-state prompts.
+- [x] **5.4 Cascaded Table Schema Builder UI (`/public/js/admin-schema.js`)** *(Updated via Architecture Overhaul `@overhaul_stage.md`)*:
+  - [x] Build schema manager with cascaded selectors where Admins select a Category and Sub-Category to view defined custom columns.
+  - [x] Build "Add / Edit Column" modal supporting data type selection (`text`, `number`, `date`, `boolean`, `select`), label input, required checkbox, and sort order number bound to `sub_category_id`.
   - [x] Implement column reordering and deletion with safety confirmation prompts.
 - [ ] **5.5 Dynamic Data Row Editor (`/public/js/admin-records.js`)**:
-  - [ ] Build record management table displaying JSON data rows for the selected category.
-  - [ ] **Dynamic Form Generator**: Write JS logic that reads the category's `custom_columns` and dynamically builds the exact HTML form inputs (`<input type="number">`, `<input type="date">`, `<select>`, etc.) inside the "Add/Edit Record" modal!
-  - [ ] Implement record insertion, modification, and deletion API bindings.
+  - [ ] Build record management table displaying JSON data rows for the selected sub-category.
+  - [ ] **Dynamic Form Generator**: Write JS logic that reads the sub-category's `custom_columns` and dynamically builds the exact HTML form inputs (`<input type="number">`, `<input type="date">`, `<select>`, etc.) inside the "Add/Edit Record" modal!
+  - [ ] Implement record insertion, modification, and deletion API bindings linked to `sub_category_id`.
 - [ ] **5.6 Live Preview Chart Customizer (`/public/js/admin-charts.js`)**:
   - [ ] Build chart configurator form with live-updating Chart.js preview canvas.
-  - [ ] Build dropdowns populated with the category's `custom_columns` to allow mapping X-Axis labels and Y-Axis numeric values.
+  - [ ] Build dropdowns populated with the sub-category's `custom_columns` to allow mapping X-Axis labels and Y-Axis numeric values.
   - [ ] Allow switching chart type (`bar`, `line`, `pie`, `doughnut`, `area`) and picking color themes, saving preferences to `/api/charts/:id`.
 
 ---

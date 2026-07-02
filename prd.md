@@ -21,10 +21,10 @@ The primary problem this application solves is the rigidity of traditional data 
 * **Goal**: Manage statistical datasets, customize presentation schemas, and configure charts.
 * **Key Needs**:
   * Secure login and session management.
-  * **Category CRUD**: Create, edit, and delete statistical data categories.
-  * **Table Schema Builder**: Define custom columns for each category (e.g., Number, Text, Date, Select/Dropdown) with labels and sort orders.
-  * **Data Row Management**: Easily insert, update, or delete data records conforming to the custom schema.
-  * **Chart Customization**: Select visual representation types (Bar, Pie, Line, Area, etc.) and map which table columns represent the X-axis (labels) and Y-axis (dataset values).
+  * **Two-Tier Category & Sub-Category CRUD**: Create, edit, and delete top-level statistical categories (Icon + Title only) and their nested sub-categories.
+  * **Table Schema Builder**: Define custom columns for each sub-category (e.g., Number, Text, Date, Select/Dropdown) with labels and sort orders.
+  * **Data Row Management**: Easily insert, update, or delete data records conforming to the sub-category's custom schema.
+  * **Chart Customization**: Select visual representation types (Bar, Pie, Line, Area, etc.) for each sub-category and map which table columns represent the X-axis (labels) and Y-axis (dataset values).
 
 ---
 
@@ -37,31 +37,31 @@ The primary problem this application solves is the rigidity of traditional data 
 * **REQ-AUTH-04**: Role-based access control (RBAC) must restrict Admin management features (`/admin/*` and CRUD API endpoints) to users with `role = 'admin'`.
 
 ### 3.2 Public Dashboard & Visualization (User Role)
-* **REQ-DASH-01**: A responsive main landing dashboard built with vibrant Tailwind CSS styling, dark/light mode aesthetics, and glassmorphic design accents.
-* **REQ-DASH-02**: A prominent **Category Selector** dropdown or tab interface allowing users to pick which statistical dataset to view.
+* **REQ-DASH-01**: A responsive main landing dashboard built with vibrant Tailwind CSS styling, dark/light mode aesthetics, and glassmorphic design accents featuring a clean **3x3 Category Grid** (icon + title only).
+* **REQ-DASH-02**: **Two-Tier Navigation**: Clicking a top-level category transitions the interface to a Data View featuring horizontal **Sub-Category Tabs** (`[Data Masjid]`, `[Data Gereja]`, etc.) and a "Kembali ke Kategori" button.
 * **REQ-DASH-03**: **Dynamic Chart Rendering**:
-  * When a category is selected, the application dynamically fetches the associated chart configuration and row data.
+  * When a sub-category tab is selected, the application dynamically fetches the associated chart configuration and row data.
   * Renders interactive visualizations using **Chart.js**.
   * Supports smooth transitions and responsive resizing across desktop, tablet, and mobile devices.
-* **REQ-DASH-04**: **Interactive Custom Table**:
-  * Renders below or adjacent to the chart using **Tabulator.js** (or modern HTML5 table grid).
-  * Automatically builds table headers based on the category's `custom_columns` definition.
-  * Provides client-side or server-side pagination, sorting by column, and keyword search/filtering.
+* **REQ-DASH-04**: **Interactive Custom Table & Exports**:
+  * Renders below or adjacent to the chart using **Tabulator.js**.
+  * Automatically builds table headers based on the sub-category's `custom_columns` definition.
+  * Provides client-side or server-side pagination, sorting by column, keyword search/filtering, and placeholder export buttons (`Copy`, `CSV`, `Excel`, `PDF`, `Print`).
 
 ### 3.3 Admin Management Suite (Admin Role)
-* **REQ-ADMIN-01**: **Category Management (CRUD)**:
-  * Create new categories with names, descriptions, and icon/color identifiers.
-  * Modify existing categories or archive/delete them.
-* **REQ-ADMIN-02**: **Custom Table Schema Builder**:
-  * Admins can add, update, reorder, or delete custom columns for any category.
+* **REQ-ADMIN-01**: **Two-Tier Category & Sub-Category Management (CRUD)**:
+  * Create top-level categories with names, icon/color identifiers (without description text).
+  * Manage nested sub-categories via a modal/drawer interface with clean empty-state prompts when a category has 0 sub-categories.
+* **REQ-ADMIN-02**: **Cascaded Custom Table Schema Builder**:
+  * Admins select a Category and Sub-Category via cascaded selectors to add, update, reorder, or delete custom columns for any sub-category.
   * Each column definition includes: `column_name` (internal key), `column_label` (display text), `data_type` (`text`, `number`, `date`, `boolean`, `select`), `is_required`, and `sort_order`.
 * **REQ-ADMIN-03**: **Data Row Editor (CRUD)**:
-  * A dynamic form builder that generates input fields based on the category's custom columns.
+  * A dynamic form builder that generates input fields based on the sub-category's custom columns.
   * Allows Admins to add new data rows, edit existing records, or delete rows.
   * Data values are validated against the defined `data_type` before saving.
 * **REQ-ADMIN-04**: **Chart Configurator**:
-  * Dedicated interface to select chart type: `bar`, `line`, `pie`, `doughnut`, `area`.
-  * Dropdown selectors allowing Admins to map specific custom columns to Chart properties (e.g., X-Axis Column = `month`, Y-Axis Value Column = `revenue`, Group By / Series Column).
+  * Dedicated interface to select chart type for a sub-category: `bar`, `line`, `pie`, `doughnut`, `area`.
+  * Dropdown selectors allowing Admins to map specific custom columns to Chart properties (e.g., X-Axis Column = `nama_masjid`, Y-Axis Value Column = `jamaah`).
   * Customization of color palettes and chart titles.
 
 ---

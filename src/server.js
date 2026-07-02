@@ -11,6 +11,7 @@ import categoryRoutes from './routes/category_routes.js';
 import columnRoutes from './routes/column_routes.js';
 import recordRoutes from './routes/record_routes.js';
 import chartRoutes from './routes/chart_routes.js';
+import subcategoryRoutes from './routes/subcategory_routes.js';
 
 dotenv.config();
 
@@ -50,6 +51,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 // API Routes
 app.use('/api/auth', authRoutes);
 app.use('/api/categories', categoryRoutes);
+app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/columns', columnRoutes);
 app.use('/api/records', recordRoutes);
 app.use('/api/charts', chartRoutes);

@@ -1,16 +1,16 @@
 import db from '../config/database.js';
 
 /**
- * Retrieve all data records for a category with pagination and optional search
- * @param {number} categoryId
+ * Retrieve all data records for a sub-category with pagination and optional search
+ * @param {number} subCategoryId
  * @param {object} options - { page, limit, search }
  */
-export function getRecordsByCategory(categoryId, { page = 1, limit = 50, search = '' } = {}) {
+export function getRecordsBySubCategory(subCategoryId, { page = 1, limit = 50, search = '' } = {}) {
   const offset = (page - 1) * limit;
 
   // Count total records (with optional search filter)
-  let countSql = 'SELECT COUNT(*) as total FROM data_records WHERE category_id = ?';
-  const countParams = [categoryId];
+  let countSql = 'SELECT COUNT(*) as total FROM data_records WHERE sub_category_id = ?';
+  const countParams = [subCategoryId];
 
   if (search) {
     countSql += ' AND data LIKE ?';
@@ -21,8 +21,8 @@ export function getRecordsByCategory(categoryId, { page = 1, limit = 50, search 
   const total = totalRow ? totalRow.total : 0;
 
   // Fetch paginated records
-  let dataSql = 'SELECT id, category_id, data, created_at, updated_at FROM data_records WHERE category_id = ?';
-  const dataParams = [categoryId];
+  let dataSql = 'SELECT id, sub_category_id, data, created_at, updated_at FROM data_records WHERE sub_category_id = ?';
+  const dataParams = [subCategoryId];
 
   if (search) {
     dataSql += ' AND data LIKE ?';
@@ -37,7 +37,7 @@ export function getRecordsByCategory(categoryId, { page = 1, limit = 50, search 
   // Parse JSON data column for each row
   const records = rows.map(row => ({
     id: row.id,
-    category_id: row.category_id,
+    sub_category_id: row.sub_category_id,
     data: JSON.parse(row.data),
     created_at: row.created_at,
     updated_at: row.updated_at
@@ -63,13 +63,13 @@ export function getRecordById(id) {
 /**
  * Create a new data record with JSON payload
  */
-export function createRecord(categoryId, data) {
+export function createRecord(subCategoryId, data) {
   const jsonStr = JSON.stringify(data);
   const stmt = db.prepare(
-    'INSERT INTO data_records (category_id, data, created_at, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'
+    'INSERT INTO data_records (sub_category_id, data, created_at, updated_at) VALUES (?, ?, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)'
   );
-  const result = stmt.run(categoryId, jsonStr);
-  return { id: result.lastInsertRowid, category_id: categoryId, data };
+  const result = stmt.run(subCategoryId, jsonStr);
+  return { id: result.lastInsertRowid, sub_category_id: subCategoryId, data };
 }
 
 /**
@@ -94,23 +94,14 @@ export function deleteRecord(id) {
 }
 
 /**
- * Extract specific column values from all records in a category using json_extract
+ * Extract specific column values from all records in a sub-category using json_extract
  * Used for chart data aggregation
- * @param {number} categoryId
+ * @param {number} subCategoryId
  * @param {string} xColumn - JSON key for X axis labels
  * @param {string} yColumn - JSON key for Y axis values
  */
-export function extractChartData(categoryId, xColumn, yColumn) {
-  const sql = `
-    SELECT
-      id,
-      json_extract(data, '$.' || ?) AS x_label,
-      json_extract(data, '$.' || ?) AS y_value
-    FROM data_records
-    WHERE category_id = ?
-    ORDER BY id ASC
-  `;
-  // Note: SQLite json_extract with dynamic keys via || concatenation
+export function extractChartData(subCategoryId, xColumn, yColumn) {
+  // Note: SQLite json_extract with dynamic keys
   // We use direct string interpolation for the JSON path since these are admin-defined column names
   const safeSql = `
     SELECT
@@ -118,8 +109,8 @@ export function extractChartData(categoryId, xColumn, yColumn) {
       json_extract(data, '$.${xColumn}') AS x_label,
       json_extract(data, '$.${yColumn}') AS y_value
     FROM data_records
-    WHERE category_id = ?
+    WHERE sub_category_id = ?
     ORDER BY id ASC
   `;
-  return db.prepare(safeSql).all(categoryId);
+  return db.prepare(safeSql).all(subCategoryId);
 }

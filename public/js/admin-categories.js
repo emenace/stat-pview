@@ -1,16 +1,26 @@
 /**
- * Admin Categories Manager — Interactive CRUD table for statistical categories
+ * Admin Categories & Sub-Categories Manager — Interactive CRUD table
  * Renders inside #admin-categories-root on admin.html
  */
 
-import { getCategories, createCategory, updateCategory, deleteCategory, showToast } from './api-service.js';
+import {
+  getCategories,
+  createCategory,
+  updateCategory,
+  deleteCategory,
+  getSubCategories,
+  createSubCategory,
+  updateSubCategory,
+  deleteSubCategory,
+  showToast,
+} from './api-service.js';
 import { openModal, closeModal } from './admin.js';
 
 let categoriesData = [];
 
 // Available icon options with labels and SVG paths
 const ICON_OPTIONS = [
-  { value: 'chart-bar', label: 'Grafik Batang', path: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z' },
+  { value: 'chart-bar', label: 'Grafik Batang', path: 'M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625z' },
   { value: 'building', label: 'Bangunan', path: 'M8.25 21v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21m0 0h4.5V3.545M12.75 21h7.5V10.75M2.25 21h1.5m18 0h-18M2.25 9l4.5-1.636M18.75 3l-1.5.545m0 6.205l3 1m1.5.5l-1.5-.5M6.75 7.364V3h-3v18m3-13.636l10.5-3.819' },
   { value: 'map', label: 'Peta', path: 'M9 6.75V15m6-6v8.25m.503 3.498l4.875-2.437c.381-.19.622-.58.622-1.006V4.82c0-.836-.88-1.38-1.628-1.006l-3.869 1.934c-.317.159-.69.159-1.006 0L9.503 3.252a1.125 1.125 0 00-1.006 0L3.622 5.689C3.24 5.88 3 6.27 3 6.695V19.18c0 .836.88 1.38 1.628 1.006l3.869-1.934c.317-.159.69-.159 1.006 0l4.994 2.497c.317.158.69.158 1.006 0z' },
   { value: 'users', label: 'Pengguna', path: 'M18 18.72a9.094 9.094 0 003.741-.479 3 3 0 00-4.682-2.72m.94 3.198l.001.031c0 .225-.012.447-.037.666A11.944 11.944 0 0112 21c-2.17 0-4.207-.576-5.963-1.584A6.062 6.062 0 016 18.719m12 0a5.971 5.971 0 00-.941-3.197m0 0A5.995 5.995 0 0012 12.75a5.995 5.995 0 00-5.058 2.772m0 0a3 3 0 00-4.681 2.72 8.986 8.986 0 003.74.477m.94-3.197a5.971 5.971 0 00-.94 3.197M15 6.75a3 3 0 11-6 0 3 3 0 016 0zm6 3a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0zm-13.5 0a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z' },
@@ -40,8 +50,8 @@ function renderCategoryShell() {
   return `
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
       <div>
-        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Daftar Kategori</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Kelola kategori dataset statistik yang ditampilkan di dashboard publik</p>
+        <h3 class="text-xl font-bold text-slate-900 dark:text-white">Daftar Kategori Utama</h3>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Kelola kategori dan sub-kategori dataset statistik yang ditampilkan di dashboard publik</p>
       </div>
       <button id="btn-add-category" class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold transition-all duration-200 shadow-md shadow-emerald-600/20 hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer">
         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
@@ -76,12 +86,11 @@ async function loadAndRenderCategories() {
  * Render the categories table using Tabulator
  */
 function renderCategoriesTable(container) {
-  // Flatten for display
   const tableData = categoriesData.map((cat, idx) => ({
     _row: idx + 1,
     id: cat.id,
     name: cat.name,
-    description: cat.description || '-',
+    sub_count: cat.sub_categories ? cat.sub_categories.length : 0,
     icon: cat.icon || 'chart-bar',
     color_theme: cat.color_theme || 'emerald',
     created_at: cat.created_at,
@@ -109,20 +118,30 @@ function renderCategoriesTable(container) {
           </div>`;
         },
       },
-      { title: 'Nama Kategori', field: 'name', minWidth: 180 },
-      { title: 'Deskripsi', field: 'description', minWidth: 200 },
+      { title: 'Nama Kategori', field: 'name', minWidth: 200 },
+      {
+        title: 'Sub-Kategori',
+        field: 'sub_count',
+        width: 140,
+        hozAlign: 'center',
+        formatter: function (cell) {
+          const count = cell.getValue();
+          return `<span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-300">${count} Sub-Kategori</span>`;
+        },
+      },
       {
         title: 'Aksi',
         field: 'id',
-        width: 160,
+        width: 240,
         hozAlign: 'center',
         headerSort: false,
         formatter: function (cell) {
           const id = cell.getValue();
           return `
-            <div class="flex items-center justify-center gap-2">
-              <button data-action="edit" data-id="${id}" class="px-3 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-600 dark:text-amber-400 text-xs font-semibold transition-all cursor-pointer">Edit</button>
-              <button data-action="delete" data-id="${id}" class="px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 text-xs font-semibold transition-all cursor-pointer">Hapus</button>
+            <div class="flex items-center justify-center gap-1.5">
+              <button data-action="subcategories" data-id="${id}" class="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/50 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 text-emerald-600 dark:text-emerald-400 text-xs font-semibold transition-all cursor-pointer">Kelola Sub</button>
+              <button data-action="edit" data-id="${id}" class="px-2.5 py-1.5 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/50 text-amber-600 dark:text-amber-400 text-xs font-semibold transition-all cursor-pointer">Edit</button>
+              <button data-action="delete" data-id="${id}" class="px-2.5 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 text-xs font-semibold transition-all cursor-pointer">Hapus</button>
             </div>
           `;
         },
@@ -131,12 +150,15 @@ function renderCategoriesTable(container) {
           if (!target) return;
           const action = target.dataset.action;
           const id = parseInt(target.dataset.id);
-          if (action === 'edit') {
-            const cat = categoriesData.find(c => c.id === id);
-            if (cat) openCategoryModal(cat);
+          const cat = categoriesData.find(c => c.id === id);
+          if (!cat) return;
+
+          if (action === 'subcategories') {
+            openSubCategoriesModal(cat);
+          } else if (action === 'edit') {
+            openCategoryModal(cat);
           } else if (action === 'delete') {
-            const cat = categoriesData.find(c => c.id === id);
-            if (cat) confirmDeleteCategory(cat);
+            confirmDeleteCategory(cat);
           }
         },
       },
@@ -151,7 +173,6 @@ function openCategoryModal(category) {
   const isEdit = !!category;
   const title = isEdit ? 'Edit Kategori' : 'Tambah Kategori Baru';
 
-  // Build icon selector options
   const iconOptionsHtml = ICON_OPTIONS.map((icon) => {
     const selected = (category && category.icon === icon.value) ? 'selected' : '';
     return `<option value="${icon.value}" ${selected}>${icon.label}</option>`;
@@ -164,11 +185,6 @@ function openCategoryModal(category) {
         <input type="text" id="cat-name" required placeholder="Contoh: Tempat Ibadah Kota Metro"
           value="${isEdit ? category.name : ''}"
           class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-sm" />
-      </div>
-      <div>
-        <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Deskripsi</label>
-        <textarea id="cat-description" rows="3" placeholder="Deskripsi singkat kategori data statistik"
-          class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500 transition-all text-sm resize-none">${isEdit ? (category.description || '') : ''}</textarea>
       </div>
       <div class="grid grid-cols-2 gap-4">
         <div>
@@ -200,11 +216,9 @@ function openCategoryModal(category) {
 
   openModal(title, bodyHtml, footerHtml);
 
-  // Bind modal actions
   document.getElementById('modal-cancel').addEventListener('click', closeModal);
   document.getElementById('modal-save').addEventListener('click', async () => {
     const name = document.getElementById('cat-name').value.trim();
-    const description = document.getElementById('cat-description').value.trim();
     const icon = document.getElementById('cat-icon').value;
     const color_theme = document.getElementById('cat-color-theme').value;
 
@@ -213,7 +227,7 @@ function openCategoryModal(category) {
       return;
     }
 
-    const payload = { name, description, icon, color_theme };
+    const payload = { name, icon, color_theme };
 
     try {
       if (isEdit) {
@@ -232,6 +246,132 @@ function openCategoryModal(category) {
 }
 
 /**
+ * Open modal to manage Sub-Categories for a Category
+ */
+async function openSubCategoriesModal(category) {
+  let subs = [];
+  try {
+    const res = await getSubCategories(category.id);
+    subs = res.data || [];
+  } catch (err) {
+    showToast('Gagal memuat sub-kategori.', 'error');
+  }
+
+  const renderSubsList = (list) => {
+    if (list.length === 0) {
+      return `
+        <div class="py-12 text-center bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.2" stroke="currentColor" class="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto mb-3">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25H12" />
+          </svg>
+          <h4 class="text-base font-bold text-slate-700 dark:text-slate-300 mb-1">Belum Ada Sub-Kategori</h4>
+          <p class="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto mb-4">Kategori ini belum memiliki sub-kategori. Tambahkan sub-kategori pertama untuk mulai mengelola kolom dan data statistik.</p>
+        </div>
+      `;
+    }
+
+    const rows = list.map((sub, idx) => `
+      <div class="flex items-center justify-between p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700">
+        <div class="flex items-center gap-3">
+          <span class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-900/60 text-emerald-700 dark:text-emerald-300 font-bold text-xs flex items-center justify-center">${idx + 1}</span>
+          <span class="font-semibold text-sm text-slate-800 dark:text-slate-200">${sub.name}</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <button type="button" data-subaction="edit" data-subid="${sub.id}" data-subname="${sub.name}" class="px-2.5 py-1 rounded-lg bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 text-amber-600 dark:text-amber-400 text-xs font-semibold cursor-pointer">Edit</button>
+          <button type="button" data-subaction="delete" data-subid="${sub.id}" data-subname="${sub.name}" class="px-2.5 py-1 rounded-lg bg-red-50 dark:bg-red-950/50 hover:bg-red-100 text-red-600 dark:text-red-400 text-xs font-semibold cursor-pointer">Hapus</button>
+        </div>
+      </div>
+    `).join('');
+
+    return `<div class="space-y-2 max-h-60 overflow-y-auto pr-1">${rows}</div>`;
+  };
+
+  const bodyHtml = `
+    <div>
+      <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-200 dark:border-slate-800">
+        <div>
+          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Kategori Induk</span>
+          <h4 class="text-base font-bold text-emerald-600 dark:text-emerald-400">${category.name}</h4>
+        </div>
+        <button id="btn-add-subcat-inline" type="button" class="px-3 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-semibold transition-all shadow-sm cursor-pointer flex items-center gap-1.5">
+          <span>+ Tambah Sub</span>
+        </button>
+      </div>
+      <div id="subcat-list-container">
+        ${renderSubsList(subs)}
+      </div>
+    </div>
+  `;
+
+  const footerHtml = `
+    <button id="modal-close-subcat" class="px-5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-sm font-semibold transition-all cursor-pointer">Tutup</button>
+  `;
+
+  openModal(`Kelola Sub-Kategori`, bodyHtml, footerHtml);
+
+  document.getElementById('modal-close-subcat').addEventListener('click', () => {
+    closeModal();
+    loadAndRenderCategories();
+  });
+
+  const bindSubcatListActions = (currentSubs) => {
+    const listCont = document.getElementById('subcat-list-container');
+    if (!listCont) return;
+
+    listCont.addEventListener('click', async (e) => {
+      const btn = e.target.closest('button');
+      if (!btn) return;
+      const subaction = btn.dataset.subaction;
+      const subid = parseInt(btn.dataset.subid);
+      const subname = btn.dataset.subname;
+
+      if (subaction === 'edit') {
+        const newName = prompt('Masukkan nama sub-kategori baru:', subname);
+        if (newName && newName.trim() && newName.trim() !== subname) {
+          try {
+            await updateSubCategory(subid, { name: newName.trim(), sort_order: 10 });
+            showToast('Sub-kategori berhasil diperbarui.', 'success');
+            const res = await getSubCategories(category.id);
+            listCont.innerHTML = renderSubsList(res.data || []);
+          } catch (err) {
+            showToast(err.message || 'Gagal memperbarui sub-kategori.', 'error');
+          }
+        }
+      } else if (subaction === 'delete') {
+        if (confirm(`Hapus sub-kategori "${subname}" beserta seluruh datanya?`)) {
+          try {
+            await deleteSubCategory(subid);
+            showToast('Sub-kategori berhasil dihapus.', 'success');
+            const res = await getSubCategories(category.id);
+            listCont.innerHTML = renderSubsList(res.data || []);
+          } catch (err) {
+            showToast(err.message || 'Gagal menghapus sub-kategori.', 'error');
+          }
+        }
+      }
+    });
+  };
+
+  bindSubcatListActions(subs);
+
+  document.getElementById('btn-add-subcat-inline').addEventListener('click', async () => {
+    const name = prompt(`Masukkan nama sub-kategori baru untuk "${category.name}":`);
+    if (!name || !name.trim()) return;
+
+    try {
+      await createSubCategory({ category_id: category.id, name: name.trim(), sort_order: (subs.length + 1) * 10 });
+      showToast(`Sub-kategori "${name.trim()}" berhasil ditambahkan.`, 'success');
+      const res = await getSubCategories(category.id);
+      subs = res.data || [];
+      const listCont = document.getElementById('subcat-list-container');
+      if (listCont) listCont.innerHTML = renderSubsList(subs);
+    } catch (err) {
+      showToast(err.message || 'Gagal menambahkan sub-kategori.', 'error');
+    }
+  });
+}
+
+/**
  * Confirm and delete a category
  */
 function confirmDeleteCategory(category) {
@@ -244,7 +384,7 @@ function confirmDeleteCategory(category) {
       </div>
       <h4 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Hapus Kategori?</h4>
       <p class="text-sm text-slate-500 dark:text-slate-400">
-        Kategori <strong class="text-slate-700 dark:text-slate-200">"${category.name}"</strong> beserta seluruh kolom, data record, dan konfigurasi chart yang terkait akan dihapus secara permanen.
+        Kategori <strong class="text-slate-700 dark:text-slate-200">"${category.name}"</strong> beserta seluruh sub-kategori, kolom, data record, dan konfigurasi chart yangerkait akan dihapus secara permanen.
       </p>
     </div>
   `;

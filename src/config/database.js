@@ -30,6 +30,22 @@ db.pragma('foreign_keys = ON');
 export function initDatabase() {
   console.log('[Database] Initializing SQLite tables...');
 
+  if (!isProd) {
+    // Drop old schema tables if migrating from category_id to sub_category_id in dev mode
+    const colCheck = db.prepare("PRAGMA table_info(custom_columns)").all();
+    const hasSubCat = colCheck.some(c => c.name === 'sub_category_id');
+    if (colCheck.length > 0 && !hasSubCat) {
+      console.log('[Database] Old schema detected in Dev mode. Dropping tables for clean migration...');
+      db.exec(`
+        DROP TABLE IF EXISTS chart_configs;
+        DROP TABLE IF EXISTS data_records;
+        DROP TABLE IF EXISTS custom_columns;
+        DROP TABLE IF EXISTS sub_categories;
+        DROP TABLE IF EXISTS categories;
+      `);
+    }
+  }
+
   db.exec(`
     CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,45 +58,53 @@ export function initDatabase() {
     CREATE TABLE IF NOT EXISTS categories (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       name TEXT NOT NULL,
-      description TEXT,
       icon TEXT DEFAULT 'chart-bar',
-      color_theme TEXT DEFAULT 'indigo',
+      color_theme TEXT DEFAULT 'emerald',
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    CREATE TABLE IF NOT EXISTS sub_categories (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      category_id INTEGER NOT NULL,
+      name TEXT NOT NULL,
+      sort_order INTEGER DEFAULT 0,
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
     );
 
     CREATE TABLE IF NOT EXISTS custom_columns (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      category_id INTEGER NOT NULL,
+      sub_category_id INTEGER NOT NULL,
       column_name TEXT NOT NULL,
       column_label TEXT NOT NULL,
       data_type TEXT CHECK(data_type IN ('text', 'number', 'date', 'boolean', 'select')) DEFAULT 'text',
       is_required BOOLEAN DEFAULT 0,
       sort_order INTEGER DEFAULT 0,
-      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE,
-      UNIQUE(category_id, column_name)
+      FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id) ON DELETE CASCADE,
+      UNIQUE(sub_category_id, column_name)
     );
 
     CREATE TABLE IF NOT EXISTS data_records (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      category_id INTEGER NOT NULL,
+      sub_category_id INTEGER NOT NULL,
       data TEXT NOT NULL CHECK(json_valid(data)),
       created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
       updated_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+      FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id) ON DELETE CASCADE
     );
 
-    CREATE INDEX IF NOT EXISTS idx_records_category ON data_records(category_id);
+    CREATE INDEX IF NOT EXISTS idx_records_subcategory ON data_records(sub_category_id);
 
     CREATE TABLE IF NOT EXISTS chart_configs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
-      category_id INTEGER UNIQUE NOT NULL,
+      sub_category_id INTEGER UNIQUE NOT NULL,
       chart_type TEXT CHECK(chart_type IN ('bar', 'line', 'pie', 'doughnut', 'area')) DEFAULT 'bar',
       x_axis_column TEXT,
       y_axis_column TEXT,
       group_by_column TEXT,
-      palette TEXT DEFAULT 'default',
+      palette TEXT DEFAULT 'emerald',
       title TEXT,
-      FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE CASCADE
+      FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id) ON DELETE CASCADE
     );
   `);
 
@@ -124,70 +148,105 @@ function seedDefaultAccounts() {
 function seedDummyDevData() {
   const row = db.prepare('SELECT COUNT(*) as count FROM categories').get();
   if (row && row.count === 0) {
-    console.log('[Database] Dev mode & categories table empty. Seeding rich Kemenag Metro dataset...');
+    console.log('[Database] Dev mode & categories table empty. Seeding 9 Kemenag Metro categories and sub-categories...');
 
-    const insertCat = db.prepare('INSERT INTO categories (name, description, icon, color_theme) VALUES (?, ?, ?, ?)');
-    const insertCol = db.prepare('INSERT INTO custom_columns (category_id, column_name, column_label, data_type, is_required, sort_order) VALUES (?, ?, ?, ?, ?, ?)');
-    const insertRec = db.prepare('INSERT INTO data_records (category_id, data) VALUES (?, ?)');
-    const insertChart = db.prepare('INSERT INTO chart_configs (category_id, chart_type, x_axis_column, y_axis_column, palette, title) VALUES (?, ?, ?, ?, ?, ?)');
+    const insertCat = db.prepare('INSERT INTO categories (name, icon, color_theme) VALUES (?, ?, ?)');
+    const insertSub = db.prepare('INSERT INTO sub_categories (category_id, name, sort_order) VALUES (?, ?, ?)');
+    const insertCol = db.prepare('INSERT INTO custom_columns (sub_category_id, column_name, column_label, data_type, is_required, sort_order) VALUES (?, ?, ?, ?, ?, ?)');
+    const insertRec = db.prepare('INSERT INTO data_records (sub_category_id, data) VALUES (?, ?)');
+    const insertChart = db.prepare('INSERT INTO chart_configs (sub_category_id, chart_type, x_axis_column, y_axis_column, palette, title) VALUES (?, ?, ?, ?, ?, ?)');
 
     db.transaction(() => {
-      // 1. Category: Tempat Ibadah
-      const cat1Id = insertCat.run('Tempat Ibadah Kota Metro', 'Statistik jumlah tempat ibadah berdasarkan jenis dan kecamatan di wilayah Kota Metro', 'building', 'emerald').lastInsertRowid;
-      insertCol.run(cat1Id, 'jenis', 'Jenis Tempat Ibadah', 'select', 1, 10);
-      insertCol.run(cat1Id, 'kecamatan', 'Kecamatan', 'select', 1, 20);
-      insertCol.run(cat1Id, 'jumlah', 'Jumlah Jamaah', 'number', 1, 30);
-      insertCol.run(cat1Id, 'status', 'Status Tanah', 'text', 0, 40);
+      // 1. Data Pegawai
+      const cat1 = insertCat.run('Data Pegawai', 'users', 'emerald').lastInsertRowid;
+      insertSub.run(cat1, 'Data Pegawai PNS', 10);
+      insertSub.run(cat1, 'Data Pegawai Non PNS', 20);
 
-      const ibadahData = [
-        { jenis: 'Masjid', kecamatan: 'Metro Pusat', jumlah: 1250, status: 'Wakaf' },
-        { jenis: 'Masjid', kecamatan: 'Metro Timur', jumlah: 980, status: 'Wakaf' },
-        { jenis: 'Masjid', kecamatan: 'Metro Barat', jumlah: 850, status: 'Wakaf' },
-        { jenis: 'Masjid', kecamatan: 'Metro Utara', jumlah: 720, status: 'Wakaf' },
-        { jenis: 'Masjid', kecamatan: 'Metro Selatan', jumlah: 640, status: 'Wakaf' },
-        { jenis: 'Gereja', kecamatan: 'Metro Pusat', jumlah: 450, status: 'Sertifikat Sendiri' },
-        { jenis: 'Gereja', kecamatan: 'Metro Timur', jumlah: 310, status: 'Sertifikat Sendiri' },
-        { jenis: 'Vihara', kecamatan: 'Metro Pusat', jumlah: 180, status: 'Sertifikat Sendiri' }
+      // 2. Data KUA
+      const cat2 = insertCat.run('Data KUA', 'building-office', 'emerald').lastInsertRowid;
+      insertSub.run(cat2, 'Data Kondisi dan Status', 10);
+      insertSub.run(cat2, 'Tipologi KUA', 20);
+
+      // 3. Data Rumah Ibadah
+      const cat3 = insertCat.run('Data Rumah Ibadah', 'home', 'emerald').lastInsertRowid;
+      const subMasjid = insertSub.run(cat3, 'Data Masjid', 10).lastInsertRowid;
+      const subMushollah = insertSub.run(cat3, 'Data Mushollah', 20).lastInsertRowid;
+      const subGereja = insertSub.run(cat3, 'Data Gereja', 30).lastInsertRowid;
+      insertSub.run(cat3, 'Data Vihara', 40);
+      insertSub.run(cat3, 'Data Pura', 50);
+
+      // Columns for Data Masjid (matching Screenshot 2)
+      insertCol.run(subMasjid, 'nama_masjid', 'NAMA MASJID', 'text', 1, 10);
+      insertCol.run(subMasjid, 'kabupaten', 'KABUPATEN', 'text', 1, 20);
+      insertCol.run(subMasjid, 'kecamatan', 'KECAMATAN', 'select', 1, 30);
+      insertCol.run(subMasjid, 'tipologi', 'TIPOLOGI', 'select', 1, 40);
+      insertCol.run(subMasjid, 'alamat', 'ALAMAT', 'text', 0, 50);
+
+      const masjidRecords = [
+        { nama_masjid: 'Al-Mujahidin', kabupaten: 'Kota Metro', kecamatan: 'Metro Pusat', tipologi: 'Masjid Besar', alamat: 'Jl. AH Nasution No. 1' },
+        { nama_masjid: 'Nurul Quba', kabupaten: 'Kota Metro', kecamatan: 'Metro Timur', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Ki Hajar Dewantara' },
+        { nama_masjid: 'Nurul Yaqin', kabupaten: 'Kota Metro', kecamatan: 'Metro Barat', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Sudirman' },
+        { nama_masjid: 'As Syuhada', kabupaten: 'Kota Metro', kecamatan: 'Metro Utara', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Imam Bonjol' },
+        { nama_masjid: 'Nurul Huda', kabupaten: 'Kota Metro', kecamatan: 'Metro Selatan', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Soekarno Hatta' },
+        { nama_masjid: 'Takwa', kabupaten: 'Kota Metro', kecamatan: 'Metro Pusat', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Diponegoro' },
+        { nama_masjid: 'Nurul Iman', kabupaten: 'Kota Metro', kecamatan: 'Metro Timur', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Batanghari' },
+        { nama_masjid: 'Babul Khaer', kabupaten: 'Kota Metro', kecamatan: 'Metro Barat', tipologi: 'Masjid di Tempat Publik', alamat: 'Jl. Jend. Ryacudu' }
       ];
-      ibadahData.forEach(d => insertRec.run(cat1Id, JSON.stringify(d)));
-      insertChart.run(cat1Id, 'bar', 'kecamatan', 'jumlah', 'emerald', 'Jumlah Jamaah Tempat Ibadah per Kecamatan');
+      masjidRecords.forEach(d => insertRec.run(subMasjid, JSON.stringify(d)));
+      insertChart.run(subMasjid, 'bar', 'kecamatan', 'nama_masjid', 'emerald', 'Distribusi Masjid per Kecamatan');
 
-      // 2. Category: Tanah Wakaf
-      const cat2Id = insertCat.run('Tanah Wakaf Kota Metro', 'Data aset tanah wakaf berdasarkan kecamatan, luas lahan, dan peruntukannya', 'map', 'emerald').lastInsertRowid;
-      insertCol.run(cat2Id, 'kecamatan', 'Kecamatan', 'select', 1, 10);
-      insertCol.run(cat2Id, 'luas', 'Luas Lahan (m²)', 'number', 1, 20);
-      insertCol.run(cat2Id, 'peruntukan', 'Peruntukan', 'select', 1, 30);
-      insertCol.run(cat2Id, 'wakif', 'Nama Wakif', 'text', 0, 40);
+      // Columns for Data Mushollah
+      insertCol.run(subMushollah, 'nama_mushollah', 'NAMA MUSHOLLAH', 'text', 1, 10);
+      insertCol.run(subMushollah, 'kecamatan', 'KECAMATAN', 'select', 1, 20);
+      insertCol.run(subMushollah, 'alamat', 'ALAMAT', 'text', 0, 30);
+      insertRec.run(subMushollah, JSON.stringify({ nama_mushollah: 'Mushollah Al-Ikhlas', kecamatan: 'Metro Pusat', alamat: 'Jl. Kurma' }));
+      insertRec.run(subMushollah, JSON.stringify({ nama_mushollah: 'Mushollah An-Nur', kecamatan: 'Metro Timur', alamat: 'Jl. Semangka' }));
 
-      const wakafData = [
-        { kecamatan: 'Metro Pusat', luas: 2500, peruntukan: 'Masjid', wakif: 'H. Abdullah' },
-        { kecamatan: 'Metro Timur', luas: 4200, peruntukan: 'Pendidikan', wakif: 'Hj. Siti Rahma' },
-        { kecamatan: 'Metro Barat', luas: 1800, peruntukan: 'Mushola', wakif: 'H. Suherman' },
-        { kecamatan: 'Metro Utara', luas: 3500, peruntukan: 'Pondok Pesantren', wakif: 'K.H. Ahmad Dahlan' },
-        { kecamatan: 'Metro Selatan', luas: 1200, peruntukan: 'Makam / TPU', wakif: 'Keluarga Besar Sukirman' },
-        { kecamatan: 'Metro Pusat', luas: 3000, peruntukan: 'Pendidikan', wakif: 'Yayasan Al-Ikhlas' }
-      ];
-      wakafData.forEach(d => insertRec.run(cat2Id, JSON.stringify(d)));
-      insertChart.run(cat2Id, 'pie', 'peruntukan', 'luas', 'emerald', 'Distribusi Luas Tanah Wakaf berdasarkan Peruntukan (m²)');
+      // Columns for Data Gereja
+      insertCol.run(subGereja, 'nama_gereja', 'NAMA GEREJA', 'text', 1, 10);
+      insertCol.run(subGereja, 'kecamatan', 'KECAMATAN', 'select', 1, 20);
+      insertCol.run(subGereja, 'alamat', 'ALAMAT', 'text', 0, 30);
+      insertRec.run(subGereja, JSON.stringify({ nama_gereja: 'Gereja HKBP Metro', kecamatan: 'Metro Pusat', alamat: 'Jl. Diponegoro No. 15' }));
+      insertRec.run(subGereja, JSON.stringify({ nama_gereja: 'Gereja Katolik Hati Kudus', kecamatan: 'Metro Pusat', alamat: 'Jl. Jend. Sudirman' }));
 
-      // 3. Category: Pencatatan Pernikahan (5 KUA Kecamatan, only 5 records)
-      const cat3Id = insertCat.run('Pencatatan Pernikahan KUA', 'Statistik jumlah pernikahan yang tercatat pada 5 KUA Kecamatan se-Kota Metro tahun 2026', 'users', 'emerald').lastInsertRowid;
-      insertCol.run(cat3Id, 'kua', 'KUA Kecamatan', 'select', 1, 10);
-      insertCol.run(cat3Id, 'jumlah', 'Jumlah Pernikahan', 'number', 1, 20);
-      insertCol.run(cat3Id, 'bulan', 'Periode', 'text', 1, 30);
+      // 4. Data Umat Beragama
+      const cat4 = insertCat.run('Data Umat Beragama', 'user-group', 'emerald').lastInsertRowid;
+      insertSub.run(cat4, 'Umat Islam', 10);
+      insertSub.run(cat4, 'Umat Kristen', 20);
+      insertSub.run(cat4, 'Umat Katolik', 30);
+      insertSub.run(cat4, 'Umat Hindu', 40);
+      insertSub.run(cat4, 'Umat Buddha', 50);
 
-      const nikahData = [
-        { kua: 'KUA Metro Pusat', jumlah: 145, bulan: 'Semester I 2026' },
-        { kua: 'KUA Metro Timur', jumlah: 132, bulan: 'Semester I 2026' },
-        { kua: 'KUA Metro Barat', jumlah: 98, bulan: 'Semester I 2026' },
-        { kua: 'KUA Metro Utara', jumlah: 85, bulan: 'Semester I 2026' },
-        { kua: 'KUA Metro Selatan', jumlah: 76, bulan: 'Semester I 2026' }
-      ];
-      nikahData.forEach(d => insertRec.run(cat3Id, JSON.stringify(d)));
-      insertChart.run(cat3Id, 'bar', 'kua', 'jumlah', 'emerald', 'Jumlah Pernikahan Terdaftar per KUA Kecamatan');
+      // 5. Data Haji dan Umrah
+      const cat5 = insertCat.run('Data Haji dan Umrah', 'globe-alt', 'emerald').lastInsertRowid;
+      insertSub.run(cat5, 'Data KBIH', 10);
+      insertSub.run(cat5, 'PPIU', 20);
+      insertSub.run(cat5, 'Waiting List Haji', 30);
+
+      // 6. Data Pondok Pesantren
+      const cat6 = insertCat.run('Data Pondok Pesantren', 'academic-cap', 'emerald').lastInsertRowid;
+      insertSub.run(cat6, 'Data Santri', 10);
+      insertSub.run(cat6, 'Data Ustadz dan Guru', 20);
+
+      // 7. Data Pendidikan Madrasah
+      const cat7 = insertCat.run('Data Pendidikan Madrasah', 'book-open', 'emerald').lastInsertRowid;
+      insertSub.run(cat7, 'Madrasah Ibtidaiyah (MI)', 10);
+      insertSub.run(cat7, 'Madrasah Tsanawiyah (MTs)', 20);
+      insertSub.run(cat7, 'Madrasah Aliyah (MA)', 30);
+
+      // 8. Data Pendidikan Agama Islam
+      const cat8 = insertCat.run('Data Pendidikan Agama Islam', 'identification', 'emerald').lastInsertRowid;
+      insertSub.run(cat8, 'Guru PAI SD', 10);
+      insertSub.run(cat8, 'Guru PAI SMP', 20);
+      insertSub.run(cat8, 'Guru PAI SMA/SMK', 30);
+
+      // 9. Data Wakaf
+      const cat9 = insertCat.run('Data Wakaf', 'heart', 'emerald').lastInsertRowid;
+      insertSub.run(cat9, 'Tanah Wakaf Masjid', 10);
+      insertSub.run(cat9, 'Tanah Wakaf Sosial', 20);
     })();
 
-    console.log('[Database] Dummy Kemenag Metro dataset seeded: 3 categories, 11 custom columns, 19 records, 3 chart configs.');
+    console.log('[Database] Successfully seeded 9 Kemenag Metro categories and sub-categories with sample data!');
   }
 }
 

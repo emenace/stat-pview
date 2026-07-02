@@ -11,7 +11,7 @@ Whenever you are tasked with modifying, debugging, or extending this application
 1. **Simplicity Over Complexity**: Keep dependencies to an absolute minimum. We use Vanilla JavaScript on the frontend, Node.js + Express on the backend, and local SQLite for data persistence. Do not introduce heavy frontend frameworks (React, Vue, Angular) or complex ORMs (Prisma, TypeORM) unless explicitly instructed by the user.
 2. **Dynamic JSON-Backed Schema (No DDL Migrations)**: 
    * A core feature of this platform is allowing Admins to define custom table columns and rows without running `ALTER TABLE` SQL statements.
-   * **Rule**: Custom column definitions are stored in `custom_columns`. Row data is stored as JSON in `data_records.data`. Never alter the SQLite database table structure to add user-defined fields.
+   * **Rule**: We use a two-tier Category → Sub-Category architecture. Custom column definitions are stored in `custom_columns` linked to `sub_category_id`. Row data is stored as JSON in `data_records.data` linked to `sub_category_id`. Never alter the SQLite database table structure to add user-defined fields.
 3. **Strict Role Separation**: Always verify session authentication and user roles (`admin` vs. `user`) on both backend API routes and frontend UI rendering.
 
 ---
@@ -59,8 +59,8 @@ stat-pview/
 
 ### Naming Conventions:
 * **Files**: `kebab-case.js` or `snake_case.js` (e.g., `chart-handler.js`, `auth_controller.js`). Be consistent within each directory.
-* **Database Tables**: `snake_case` plural (e.g., `users`, `categories`, `custom_columns`, `data_records`, `chart_configs`).
-* **API Endpoints**: RESTful plural nouns in lowercase (e.g., `GET /api/categories`, `POST /api/records`).
+* **Database Tables**: `snake_case` plural (e.g., `users`, `categories`, `sub_categories`, `custom_columns`, `data_records`, `chart_configs`).
+* **API Endpoints**: RESTful plural nouns in lowercase (e.g., `GET /api/categories`, `GET /api/subcategories`, `POST /api/records`).
 
 ---
 
@@ -85,12 +85,12 @@ When creating or modifying frontend interfaces in `/public`, you must follow the
 
 ### SOP-02: Working with Custom JSON Data Records
 When querying or updating `data_records`:
-* Always parse and validate the incoming JSON payload against the category's `custom_columns` definitions before inserting or updating.
+* Always parse and validate the incoming JSON payload against the sub-category's `custom_columns` definitions before inserting or updating.
 * In SQLite, use built-in JSON functions when querying specific fields:
   ```sql
-  SELECT id, category_id, json_extract(data, '$.revenue') AS revenue 
+  SELECT id, sub_category_id, json_extract(data, '$.jamaah') AS jamaah 
   FROM data_records 
-  WHERE category_id = ?;
+  WHERE sub_category_id = ?;
   ```
 
 ### SOP-03: Debugging Database or UI Issues

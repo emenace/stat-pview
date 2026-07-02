@@ -8,6 +8,7 @@ import { openModal, closeModal } from './admin.js';
 
 let categoriesData = [];
 let selectedCategoryId = null;
+let selectedSubCategoryId = null;
 let columnsData = [];
 let schemaTableInstance = null;
 
@@ -35,14 +36,17 @@ export async function initSchemaManager() {
  */
 function renderSchemaShell() {
   return `
-    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+    <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4 mb-6">
       <div>
         <h3 class="text-xl font-bold text-slate-900 dark:text-white">Skema Kolom Kustom</h3>
-        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Definisikan struktur kolom dan tipe data untuk setiap kategori dataset</p>
+        <p class="text-sm text-slate-500 dark:text-slate-400 mt-0.5">Definisikan struktur kolom dan tipe data untuk setiap sub-kategori dataset</p>
       </div>
-      <div class="flex items-center gap-3 w-full sm:w-auto">
-        <select id="schema-category-selector" class="flex-1 sm:w-64 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer transition-all">
+      <div class="flex items-center gap-3 w-full lg:w-auto flex-wrap">
+        <select id="schema-category-selector" class="flex-1 sm:w-52 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer transition-all">
           <option value="">Memuat kategori...</option>
+        </select>
+        <select id="schema-subcategory-selector" disabled class="flex-1 sm:w-52 px-4 py-2.5 rounded-xl bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 text-slate-900 dark:text-white text-sm font-medium focus:outline-none focus:ring-2 focus:ring-emerald-500 shadow-sm cursor-pointer transition-all disabled:opacity-50">
+          <option value="">Pilih Sub-Kategori...</option>
         </select>
         <button id="btn-add-column" disabled class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-sm font-semibold transition-all duration-200 shadow-md shadow-emerald-600/20 hover:shadow-lg hover:-translate-y-0.5 flex items-center gap-2 cursor-pointer flex-shrink-0">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-4 h-4">
@@ -67,7 +71,7 @@ function renderSchemaShell() {
     <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-2xl shadow-sm overflow-hidden">
       <div id="schema-table-container" class="p-4">
         <div class="text-center py-12 text-slate-400">
-          <p class="text-base">Silakan pilih kategori terlebih dahulu di atas</p>
+          <p class="text-base">Silakan pilih kategori dan sub-kategori terlebih dahulu di atas</p>
         </div>
       </div>
     </div>
@@ -75,60 +79,100 @@ function renderSchemaShell() {
 }
 
 /**
- * Fetch available categories and populate selector
+ * Fetch available categories and populate cascaded selectors
  */
 async function loadCategoriesForSchema() {
-  const selector = document.getElementById('schema-category-selector');
+  const catSelector = document.getElementById('schema-category-selector');
+  const subSelector = document.getElementById('schema-subcategory-selector');
   const addBtn = document.getElementById('btn-add-column');
-  if (!selector) return;
+  if (!catSelector || !subSelector) return;
 
   try {
     const result = await getCategories();
     categoriesData = result.data || [];
 
     if (categoriesData.length === 0) {
-      selector.innerHTML = '<option value="">Belum ada kategori tersedia</option>';
+      catSelector.innerHTML = '<option value="">Belum ada kategori</option>';
+      subSelector.innerHTML = '<option value="">Belum ada sub-kategori</option>';
       if (addBtn) addBtn.disabled = true;
       return;
     }
 
-    selector.innerHTML = categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    catSelector.innerHTML = categoriesData.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
     
-    // Select first category by default or previous selection
+    // Select first category by default
     if (!selectedCategoryId || !categoriesData.some(c => c.id === selectedCategoryId)) {
       selectedCategoryId = categoriesData[0].id;
     }
-    selector.value = selectedCategoryId;
+    catSelector.value = selectedCategoryId;
 
-    if (addBtn) {
-      addBtn.disabled = false;
-      addBtn.onclick = () => openColumnModal(null);
-    }
+    // Populate subcategories for the selected category
+    populateSubCategories(selectedCategoryId);
 
-    // Bind change event
-    selector.onchange = (e) => {
+    // Bind change event for category
+    catSelector.onchange = (e) => {
       selectedCategoryId = parseInt(e.target.value);
+      populateSubCategories(selectedCategoryId);
+    };
+
+    // Bind change event for subcategory
+    subSelector.onchange = (e) => {
+      selectedSubCategoryId = parseInt(e.target.value);
       loadAndRenderColumns();
     };
 
-    // Initial load
-    await loadAndRenderColumns();
   } catch (err) {
-    selector.innerHTML = '<option value="">Gagal memuat kategori</option>';
+    catSelector.innerHTML = '<option value="">Gagal memuat kategori</option>';
   }
 }
 
+function populateSubCategories(catId) {
+  const subSelector = document.getElementById('schema-subcategory-selector');
+  const addBtn = document.getElementById('btn-add-column');
+  const container = document.getElementById('schema-table-container');
+  if (!subSelector) return;
+
+  const cat = categoriesData.find(c => c.id === catId);
+  const subs = cat?.sub_categories || [];
+
+  if (subs.length === 0) {
+    subSelector.innerHTML = '<option value="">Tidak ada sub-kategori</option>';
+    subSelector.disabled = true;
+    selectedSubCategoryId = null;
+    if (addBtn) addBtn.disabled = true;
+    if (container) {
+      container.innerHTML = '<div class="text-center py-12 text-slate-400"><p class="text-base font-semibold">Kategori ini belum memiliki Sub-Kategori</p><p class="text-sm mt-1">Silakan tambahkan sub-kategori terlebih dahulu di menu Kategori Utama.</p></div>';
+    }
+    return;
+  }
+
+  subSelector.disabled = false;
+  subSelector.innerHTML = subs.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  
+  if (!selectedSubCategoryId || !subs.some(s => s.id === selectedSubCategoryId)) {
+    selectedSubCategoryId = subs[0].id;
+  }
+  subSelector.value = selectedSubCategoryId;
+
+  if (addBtn) {
+    addBtn.disabled = false;
+    addBtn.onclick = () => openColumnModal(null);
+  }
+
+  loadAndRenderColumns();
+}
+
 /**
- * Load columns for the selected category and render Tabulator
+ * Load columns for the selected subcategory and render Tabulator
  */
 async function loadAndRenderColumns() {
   const container = document.getElementById('schema-table-container');
-  if (!container || !selectedCategoryId) return;
+  if (!container || !selectedSubCategoryId) return;
 
   container.innerHTML = '<div class="text-center py-8 text-slate-400"><div class="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto mb-2"></div>Memuat skema kolom...</div>';
 
   try {
-    const result = await getColumns(selectedCategoryId);
+    const result = await getColumns(selectedSubCategoryId);
     columnsData = result.data || [];
     renderColumnsTable(container);
   } catch (err) {
@@ -345,7 +389,8 @@ function openColumnModal(column) {
     }
 
     const payload = {
-      category_id: selectedCategoryId,
+      sub_category_id: selectedSubCategoryId,
+      category_id: selectedSubCategoryId,
       column_name: name,
       column_label: label,
       data_type: dataType,

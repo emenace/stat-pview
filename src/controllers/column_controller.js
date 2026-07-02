@@ -1,26 +1,26 @@
 import {
-  getColumnsByCategory,
+  getColumnsBySubCategory,
   getColumnById,
   createColumn,
   updateColumn,
   deleteColumn
 } from '../models/column_model.js';
-import { getCategoryById } from '../models/category_model.js';
+import { getSubCategoryById } from '../models/subcategory_model.js';
 
 const VALID_DATA_TYPES = ['text', 'number', 'date', 'boolean', 'select'];
 
 /**
- * GET /api/columns/:category_id — List all columns for a category (Public)
+ * GET /api/columns/:sub_category_id — List all columns for a sub-category (Public)
  */
 export function listColumns(req, res) {
   try {
-    const categoryId = req.params.category_id;
-    const category = getCategoryById(categoryId);
-    if (!category) {
-      return res.status(404).json({ success: false, error: 'Category not found.' });
+    const subCategoryId = req.params.sub_category_id || req.params.category_id;
+    const subCat = getSubCategoryById(subCategoryId);
+    if (!subCat) {
+      return res.status(404).json({ success: false, error: 'Sub-category not found.' });
     }
 
-    const columns = getColumnsByCategory(categoryId);
+    const columns = getColumnsBySubCategory(subCategoryId);
     return res.status(200).json({ success: true, data: columns });
   } catch (err) {
     console.error('[ColumnController] List Error:', err);
@@ -32,11 +32,12 @@ export function listColumns(req, res) {
  * POST /api/columns — Create a new custom column (Admin Only)
  */
 export function addColumn(req, res) {
-  const { category_id, column_name, column_label, data_type, is_required, sort_order } = req.body || {};
+  const { sub_category_id, category_id, column_name, column_label, data_type, is_required, sort_order } = req.body || {};
+  const targetId = sub_category_id || category_id;
 
   // Validate required fields
-  if (!category_id) {
-    return res.status(400).json({ success: false, error: 'category_id is required.' });
+  if (!targetId) {
+    return res.status(400).json({ success: false, error: 'sub_category_id is required.' });
   }
   if (!column_name || !column_name.trim()) {
     return res.status(400).json({ success: false, error: 'column_name is required.' });
@@ -52,14 +53,14 @@ export function addColumn(req, res) {
   }
 
   try {
-    // Verify category exists
-    const category = getCategoryById(category_id);
-    if (!category) {
-      return res.status(404).json({ success: false, error: 'Category not found.' });
+    // Verify sub-category exists
+    const subCat = getSubCategoryById(targetId);
+    if (!subCat) {
+      return res.status(404).json({ success: false, error: 'Sub-category not found.' });
     }
 
     const column = createColumn({
-      category_id,
+      sub_category_id: targetId,
       column_name: column_name.trim().toLowerCase().replace(/\s+/g, '_'),
       column_label: column_label.trim(),
       data_type: data_type || 'text',
@@ -72,7 +73,7 @@ export function addColumn(req, res) {
     if (err.message && err.message.includes('UNIQUE constraint failed')) {
       return res.status(409).json({
         success: false,
-        error: `Column name "${column_name}" already exists for this category.`
+        error: `Column name "${column_name}" already exists for this sub-category.`
       });
     }
     console.error('[ColumnController] Create Error:', err);
@@ -122,7 +123,7 @@ export function editColumn(req, res) {
     if (err.message && err.message.includes('UNIQUE constraint failed')) {
       return res.status(409).json({
         success: false,
-        error: `Column name "${column_name}" already exists for this category.`
+        error: `Column name "${column_name}" already exists for this sub-category.`
       });
     }
     console.error('[ColumnController] Update Error:', err);

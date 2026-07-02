@@ -71,6 +71,31 @@ export async function deleteCategory(id) {
   });
 }
 
+// ── Sub-Categories ────────────────────────────────────
+export async function getSubCategories(categoryId) {
+  return apiFetch(`/subcategories/${categoryId}`);
+}
+
+export async function createSubCategory(data) {
+  return apiFetch('/subcategories', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateSubCategory(id, data) {
+  return apiFetch(`/subcategories/${id}`, {
+    method: 'PUT',
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteSubCategory(id) {
+  return apiFetch(`/subcategories/${id}`, {
+    method: 'DELETE',
+  });
+}
+
 // ── Custom Columns ────────────────────────────────────
 export async function getColumns(categoryId) {
   return apiFetch(`/columns/${categoryId}`);
