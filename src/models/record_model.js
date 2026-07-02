@@ -29,7 +29,7 @@ export function getRecordsBySubCategory(subCategoryId, { page = 1, limit = 50, s
     dataParams.push(`%${search}%`);
   }
 
-  dataSql += ' ORDER BY id DESC LIMIT ? OFFSET ?';
+  dataSql += ' ORDER BY id ASC LIMIT ? OFFSET ?';
   dataParams.push(limit, offset);
 
   const rows = db.prepare(dataSql).all(...dataParams);
