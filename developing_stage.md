@@ -123,10 +123,10 @@ As developers or AI agents complete each task, change the markdown checkbox from
 - [x] **5.3 Category Manager Modal & UI (`/public/js/admin-categories.js`)**:
   - [x] Create interactive table listing all categories with Edit and Delete action buttons.
   - [x] Build modal dialog form to create or update categories (Name, Description, Icon selector, Color Theme picker).
-- [ ] **5.4 Custom Table Schema Builder UI (`/public/js/admin-schema.js`)**:
-  - [ ] Build schema manager where Admins select a category and view its defined custom columns.
-  - [ ] Build "Add / Edit Column" modal supporting data type selection (`text`, `number`, `date`, `boolean`, `select`), label input, required checkbox, and sort order number.
-  - [ ] Implement column reordering and deletion with safety confirmation prompts.
+- [x] **5.4 Custom Table Schema Builder UI (`/public/js/admin-schema.js`)**:
+  - [x] Build schema manager where Admins select a category and view its defined custom columns.
+  - [x] Build "Add / Edit Column" modal supporting data type selection (`text`, `number`, `date`, `boolean`, `select`), label input, required checkbox, and sort order number.
+  - [x] Implement column reordering and deletion with safety confirmation prompts.
 - [ ] **5.5 Dynamic Data Row Editor (`/public/js/admin-records.js`)**:
   - [ ] Build record management table displaying JSON data rows for the selected category.
   - [ ] **Dynamic Form Generator**: Write JS logic that reads the category's `custom_columns` and dynamically builds the exact HTML form inputs (`<input type="number">`, `<input type="date">`, `<select>`, etc.) inside the "Add/Edit Record" modal!
