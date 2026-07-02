@@ -25,6 +25,7 @@ Whenever you are tasked with modifying, debugging, or extending this application
 * **CSS & Styling**: Tailwind CSS (use standard utility classes; maintain responsive design)
 * **Charts & Visualization**: **Chart.js** (loaded via CDN in `/public` or bundled cleanly)
 * **Data Grid / Tables**: **Tabulator.js** (for rich client-side sorting, searching, and pagination of custom JSON records)
+* **Excel I/O**: **SheetJS (`xlsx.full.min.js`)** (loaded via CDN for client-side Excel template export and bulk import parsing)
 
 ---
 
@@ -83,9 +84,10 @@ When creating or modifying frontend interfaces in `/public`, you must follow the
 3. If database access is needed, add parameterized queries in `src/models/<module>_model.js`. Never concatenate raw strings into SQL queries to prevent SQL injection!
 4. Document the new endpoint in `api_spec.md` with request/response JSON schemas.
 
-### SOP-02: Working with Custom JSON Data Records
-When querying or updating `data_records`:
-* Always parse and validate the incoming JSON payload against the sub-category's `custom_columns` definitions before inserting or updating.
+### SOP-02: Working with Custom JSON Data Records & Excel I/O
+When querying, updating, or importing `data_records`:
+* Always parse and validate incoming JSON payloads or Excel spreadsheets against the sub-category's `custom_columns` definitions before inserting or updating.
+* When handling bulk imports via SheetJS (`XLSX`), match spreadsheet header row names against either `column_label` or `column_name` of the custom columns schema.
 * In SQLite, use built-in JSON functions when querying specific fields:
   ```sql
   SELECT id, sub_category_id, json_extract(data, '$.jamaah') AS jamaah 

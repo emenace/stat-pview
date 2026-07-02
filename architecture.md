@@ -10,7 +10,7 @@ This document details the system architecture, component interactions, and data 
 graph TD
     subgraph Client Layer ["Client Layer (Browser)"]
         UI_User["Public Dashboard (index.html)<br>Tailwind CSS + Chart.js + Tabulator.js"]
-        UI_Admin["Admin Portal (admin.html)<br>Schema Builder & CRUD Editors"]
+        UI_Admin["Admin Portal (admin.html)<br>Schema Builder, CRUD Editors & SheetJS Excel I/O"]
         UI_Login["Auth Portal (login.html)"]
     end
 
@@ -134,6 +134,7 @@ The frontend is built using clean, modular ES6 JavaScript (`type="module"`) with
 | `dashboard.js` | Orchestrator — dark mode, auth state check, 3x3 category grid landing, horizontal sub-category tab bar selection, parallel data loading, empty-state handling |
 | `admin-categories.js` | Admin manager for clean category cards and a modal/drawer interface to manage sub-categories |
 | `admin-schema.js` | Admin cascaded schema builder with synchronized Category and Sub-Category selectors |
+| `admin-records.js` | Admin dynamic data row editor — reads schema to generate forms, renders Tabulator grid, and handles SheetJS Excel template export & bulk import |
 
 ### 4.2 Chart & Table Integration Flow
 ```mermaid

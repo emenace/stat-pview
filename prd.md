@@ -55,10 +55,12 @@ The primary problem this application solves is the rigidity of traditional data 
 * **REQ-ADMIN-02**: **Cascaded Custom Table Schema Builder**:
   * Admins select a Category and Sub-Category via cascaded selectors to add, update, reorder, or delete custom columns for any sub-category.
   * Each column definition includes: `column_name` (internal key), `column_label` (display text), `data_type` (`text`, `number`, `date`, `boolean`, `select`), `is_required`, and `sort_order`.
-* **REQ-ADMIN-03**: **Data Row Editor (CRUD)**:
+* **REQ-ADMIN-03**: **Data Row Editor (CRUD & Excel I/O)**:
   * A dynamic form builder that generates input fields based on the sub-category's custom columns.
   * Allows Admins to add new data rows, edit existing records, or delete rows.
   * Data values are validated against the defined `data_type` before saving.
+  * **Excel Template Export ("Format Excel")**: Admins can download a dynamically generated Excel (`.xlsx`) template formatted with headers corresponding to the sub-category schema.
+  * **Excel Bulk Import ("Import Excel")**: Admins can upload completed `.xlsx`, `.xls`, or `.csv` files using SheetJS (`XLSX`) to automatically parse and bulk-populate data rows.
 * **REQ-ADMIN-04**: **Chart Configurator**:
   * Dedicated interface to select chart type for a sub-category: `bar`, `line`, `pie`, `doughnut`, `area`.
   * Dropdown selectors allowing Admins to map specific custom columns to Chart properties (e.g., X-Axis Column = `nama_masjid`, Y-Axis Value Column = `jamaah`).
@@ -72,7 +74,7 @@ The primary problem this application solves is the rigidity of traditional data 
 * **Backend**: Node.js (v18+) with Express.js framework.
 * **Database**: Local SQLite database (`better-sqlite3` or `sqlite3`) utilizing JSON data columns for high-performance EAV storage without schema migrations.
 * **Frontend Styling**: Vanilla CSS + Tailwind CSS (via PostCSS/CLI or Tailwind CDN during prototyping, compiled for production).
-* **Frontend Interactivity**: Vanilla JavaScript (ES6+ Modules), **Chart.js** for charts, and **Tabulator.js** for tables.
+* **Frontend Interactivity**: Vanilla JavaScript (ES6+ Modules), **Chart.js** for charts, **Tabulator.js** for tables, and **SheetJS (XLSX)** for Excel spreadsheet import/export.
 
 ### 4.2 UI/UX Aesthetics & Design System
 * **Wow Factor**: The interface must avoid generic bootstrap or plain layouts. It must use modern typography (e.g., Inter or Outfit fonts), smooth gradients, micro-animations on hover/click, and cohesive color palettes.
@@ -85,6 +87,6 @@ The primary problem this application solves is the rigidity of traditional data 
 ---
 
 ## 5. Future Roadmap & Enhancements
-* **Phase 2 - Data Import/Export**: Allow Admins to upload Excel/CSV files to auto-populate custom table rows, and allow Users to export filtered tables to PDF or CSV.
+* **Phase 2 - Public Data Export**: Allow end-users on the public dashboard to export filtered tables to PDF or CSV (Admin Excel import/export is now live in Phase 1).
 * **Phase 3 - Multi-Chart Dashboards**: Enable placing multiple charts from different categories onto a single unified executive summary page.
 * **Phase 4 - Public API & Embeds**: Provide read-only iframe embed codes or JSON API endpoints so external websites can display Statistic Public View charts.
