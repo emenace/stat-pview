@@ -135,6 +135,7 @@ The frontend is built using clean, modular ES6 JavaScript (`type="module"`) with
 | `admin-categories.js` | Admin manager for clean category cards and a modal/drawer interface to manage sub-categories |
 | `admin-schema.js` | Admin cascaded schema builder with synchronized Category and Sub-Category selectors |
 | `admin-records.js` | Admin dynamic data row editor — reads schema to generate forms, renders Tabulator grid, and handles SheetJS Excel template export & bulk import |
+| `admin-charts.js` | Admin live chart configurator — allows selecting chart type, color palettes, and mapping X/Y axis columns with real-time Chart.js preview canvas |
 
 ### 4.2 Chart & Table Integration Flow
 ```mermaid

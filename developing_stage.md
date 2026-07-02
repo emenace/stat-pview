@@ -134,10 +134,10 @@ As developers or AI agents complete each task, change the markdown checkbox from
   - [x] Implement record insertion, modification, and deletion API bindings linked to `sub_category_id`.
   - [x] **Excel Template Export ("Format Excel")**: Implement functionality using SheetJS (`XLSX`) to download an Excel workbook template with column headers matching the sub-category's schema (populated with existing data if available).
   - [x] **Excel Bulk Import ("Import Excel")**: Build upload dialog and client-side SheetJS parser that reads formatted `.xlsx`/`.xls`/`.csv` spreadsheets, maps headers to schema columns, and automatically creates record rows in bulk.
-- [ ] **5.6 Live Preview Chart Customizer (`/public/js/admin-charts.js`)**:
-  - [ ] Build chart configurator form with live-updating Chart.js preview canvas.
-  - [ ] Build dropdowns populated with the sub-category's `custom_columns` to allow mapping X-Axis labels and Y-Axis numeric values.
-  - [ ] Allow switching chart type (`bar`, `line`, `pie`, `doughnut`, `area`) and picking color themes, saving preferences to `/api/charts/:id`.
+- [x] **5.6 Live Preview Chart Customizer (`/public/js/admin-charts.js`)**:
+  - [x] Build chart configurator form with live-updating Chart.js preview canvas.
+  - [x] Build dropdowns populated with the sub-category's `custom_columns` to allow mapping X-Axis labels and Y-Axis numeric values.
+  - [x] Allow switching chart type (`bar`, `line`, `pie`, `doughnut`, `area`) and picking color themes, saving preferences to `/api/charts/:id`.
 
 ---
 
