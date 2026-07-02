@@ -82,10 +82,10 @@ This specification documents the REST API endpoints for **Statistic Public View*
     "data": [
       {
         "id": 1,
-        "name": "Public Transit Ridership 2026",
-        "description": "Monthly bus and subway passenger metrics",
-        "icon": "bus",
-        "color_theme": "indigo",
+        "name": "Tempat Ibadah Kota Metro",
+        "description": "Statistik jumlah tempat ibadah berdasarkan jenis dan kecamatan",
+        "icon": "building",
+        "color_theme": "emerald",
         "created_at": "2026-07-01 10:00:00"
       }
     ]
@@ -98,9 +98,9 @@ This specification documents the REST API endpoints for **Statistic Public View*
 * **Request Body**:
   ```json
   {
-    "name": "Education Funding 2026",
-    "description": "District-level school budget allocations",
-    "icon": "academic-cap",
+    "name": "Tanah Wakaf Kota Metro",
+    "description": "Data aset tanah wakaf berdasarkan kecamatan dan peruntukan",
+    "icon": "map",
     "color_theme": "emerald"
   }
   ```
@@ -125,17 +125,17 @@ This specification documents the REST API endpoints for **Statistic Public View*
       {
         "id": 1,
         "category_id": 1,
-        "column_name": "month",
-        "column_label": "Month / Period",
-        "data_type": "text",
+        "column_name": "jenis",
+        "column_label": "Jenis Tempat Ibadah",
+        "data_type": "select",
         "is_required": 1,
         "sort_order": 10
       },
       {
         "id": 2,
         "category_id": 1,
-        "column_name": "ridership_count",
-        "column_label": "Total Passengers",
+        "column_name": "jumlah",
+        "column_label": "Jumlah Jamaah",
         "data_type": "number",
         "is_required": 1,
         "sort_order": 20
@@ -151,9 +151,9 @@ This specification documents the REST API endpoints for **Statistic Public View*
   ```json
   {
     "category_id": 1,
-    "column_name": "on_time_percentage",
-    "column_label": "On-Time Performance (%)",
-    "data_type": "number",
+    "column_name": "status",
+    "column_label": "Status Tanah",
+    "data_type": "text",
     "is_required": false,
     "sort_order": 30
   }
@@ -178,15 +178,16 @@ This specification documents the REST API endpoints for **Statistic Public View*
   ```json
   {
     "success": true,
-    "pagination": { "page": 1, "limit": 50, "total": 12 },
+    "pagination": { "page": 1, "limit": 50, "total": 8 },
     "data": [
       {
         "id": 101,
         "category_id": 1,
         "data": {
-          "month": "January 2026",
-          "ridership_count": 142000,
-          "on_time_percentage": 94.5
+          "jenis": "Masjid",
+          "kecamatan": "Metro Pusat",
+          "jumlah": 1250,
+          "status": "Wakaf"
         },
         "created_at": "2026-07-01 10:15:00"
       }
@@ -202,9 +203,10 @@ This specification documents the REST API endpoints for **Statistic Public View*
   {
     "category_id": 1,
     "data": {
-      "month": "February 2026",
-      "ridership_count": 158000,
-      "on_time_percentage": 96.2
+      "jenis": "Gereja",
+      "kecamatan": "Metro Timur",
+      "jumlah": 310,
+      "status": "Sertifikat Sendiri"
     }
   }
   ```
@@ -230,15 +232,15 @@ This specification documents the REST API endpoints for **Statistic Public View*
         "id": 1,
         "category_id": 1,
         "chart_type": "bar",
-        "x_axis_column": "month",
-        "y_axis_column": "ridership_count",
+        "x_axis_column": "kecamatan",
+        "y_axis_column": "jumlah",
         "group_by_column": null,
-        "palette": "default",
-        "title": "Monthly Public Transit Ridership (2026)"
+        "palette": "emerald",
+        "title": "Jumlah Jamaah Tempat Ibadah per Kecamatan"
       },
       "chartData": {
-        "labels": ["January 2026", "February 2026", "March 2026"],
-        "values": [142000, 158000, 167500]
+        "labels": ["Metro Pusat", "Metro Timur", "Metro Barat"],
+        "values": [1250, 980, 850]
       }
     }
   }
@@ -250,10 +252,10 @@ This specification documents the REST API endpoints for **Statistic Public View*
 * **Request Body**:
   ```json
   {
-    "chart_type": "line",
-    "x_axis_column": "month",
-    "y_axis_column": "on_time_percentage",
-    "palette": "emerald-gradient",
-    "title": "Monthly On-Time Performance Trend"
+    "chart_type": "pie",
+    "x_axis_column": "peruntukan",
+    "y_axis_column": "luas",
+    "palette": "emerald",
+    "title": "Distribusi Luas Tanah Wakaf berdasarkan Peruntukan"
   }
   ```

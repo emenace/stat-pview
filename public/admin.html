@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="id" class="">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Panel — Dashboard Data Statistik Kemenag Kota Metro</title>
+  <meta name="description" content="Panel administrasi untuk mengelola kategori, skema, data, dan chart statistik." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet" />
+
+  <!-- Tailwind CSS -->
+  <link rel="stylesheet" href="/css/output.css" />
+
+  <!-- Tabulator CSS & JS -->
+  <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet" />
+  <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.3/dist/chart.umd.min.js"></script>
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+
+    .hero-gradient {
+      background: linear-gradient(135deg, #059669 0%, #10b981 50%, #34d399 100%);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(8px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Sidebar active indicator */
+    .sidebar-link.active {
+      background: rgba(16, 185, 129, 0.1);
+      color: #059669;
+      border-left-color: #10b981;
+    }
+    .dark .sidebar-link.active {
+      background: rgba(16, 185, 129, 0.15);
+      color: #34d399;
+    }
+
+    /* Modal backdrop */
+    .modal-backdrop {
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+    }
+
+    /* Tabulator overrides for admin */
+    .tabulator {
+      background: transparent !important;
+      border: none !important;
+      border-radius: 0.75rem !important;
+      overflow: hidden;
+      font-family: 'Inter', sans-serif !important;
+      color: inherit !important;
+    }
+    .tabulator .tabulator-header {
+      background: rgba(16, 185, 129, 0.08) !important;
+      border-bottom: 2px solid rgba(16, 185, 129, 0.2) !important;
+      color: inherit !important;
+    }
+    .dark .tabulator .tabulator-header {
+      background: rgba(16, 185, 129, 0.12) !important;
+    }
+    .tabulator .tabulator-header .tabulator-col {
+      border-right: 1px solid rgba(148, 163, 184, 0.15) !important;
+      background: transparent !important;
+    }
+    .tabulator .tabulator-header .tabulator-col .tabulator-col-content .tabulator-col-title {
+      font-weight: 600 !important;
+      font-size: 0.85rem !important;
+      color: inherit !important;
+    }
+    .tabulator .tabulator-tableholder .tabulator-table {
+      background: transparent !important;
+      color: inherit !important;
+    }
+    .tabulator .tabulator-tableholder .tabulator-table .tabulator-row {
+      background: transparent !important;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.15) !important;
+      transition: background 0.15s;
+      color: inherit !important;
+    }
+    .tabulator .tabulator-tableholder .tabulator-table .tabulator-row:hover {
+      background: rgba(16, 185, 129, 0.06) !important;
+    }
+    .dark .tabulator .tabulator-tableholder .tabulator-table .tabulator-row:hover {
+      background: rgba(16, 185, 129, 0.12) !important;
+    }
+    .tabulator .tabulator-footer {
+      background: rgba(16, 185, 129, 0.04) !important;
+      border-top: 1px solid rgba(148, 163, 184, 0.2) !important;
+      color: inherit !important;
+    }
+    .tabulator .tabulator-footer .tabulator-page {
+      border: 1px solid rgba(148, 163, 184, 0.3) !important;
+      background: transparent !important;
+      color: inherit !important;
+      border-radius: 0.375rem !important;
+    }
+    .tabulator .tabulator-footer .tabulator-page.active {
+      background: #10b981 !important;
+      color: #ffffff !important;
+      border-color: #10b981 !important;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-200 transition-colors duration-300">
+
+  <div class="flex min-h-screen">
+
+    <!-- ─── Sidebar ──────────────────────────────────── -->
+    <aside id="sidebar" class="hidden lg:flex flex-col w-64 bg-white dark:bg-slate-900 border-r border-slate-200/60 dark:border-slate-800/60 shadow-sm flex-shrink-0">
+
+      <!-- Brand -->
+      <div class="p-5 border-b border-slate-200/60 dark:border-slate-800/60">
+        <a href="/" class="flex items-center gap-3 group">
+          <div class="w-10 h-10 rounded-xl hero-gradient flex items-center justify-center shadow-md shadow-emerald-500/20">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.2" stroke="white" class="w-5 h-5">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Admin Panel</h1>
+            <p class="text-xs text-slate-400 dark:text-slate-500">Kemenag Kota Metro</p>
+          </div>
+        </a>
+      </div>
+
+      <!-- Nav Links -->
+      <nav class="flex-1 p-4 space-y-1">
+        <button data-tab="categories" class="sidebar-link active w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 border-l-4 border-transparent transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+          </svg>
+          <span>Kategori</span>
+        </button>
+
+        <button data-tab="schema" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 border-l-4 border-transparent transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <span>Skema Kolom</span>
+        </button>
+
+        <button data-tab="records" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 border-l-4 border-transparent transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 6.375c0 2.278-3.694 4.125-8.25 4.125S3.75 8.653 3.75 6.375m16.5 0c0-2.278-3.694-4.125-8.25-4.125S3.75 4.097 3.75 6.375m16.5 0v11.25c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125V6.375m16.5 0v3.75m-16.5-3.75v3.75m16.5 0v3.75C20.25 16.153 16.556 18 12 18s-8.25-1.847-8.25-4.125v-3.75m16.5 0c0 2.278-3.694 4.125-8.25 4.125s-8.25-1.847-8.25-4.125" />
+          </svg>
+          <span>Data Record</span>
+        </button>
+
+        <button data-tab="charts" class="sidebar-link w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-slate-600 dark:text-slate-300 border-l-4 border-transparent transition-all duration-200 hover:bg-slate-50 dark:hover:bg-slate-800/60 cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.8" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 10.5H21A7.5 7.5 0 0013.5 3v7.5z" />
+          </svg>
+          <span>Konfigurasi Chart</span>
+        </button>
+      </nav>
+
+      <!-- Sidebar Footer -->
+      <div class="p-4 border-t border-slate-200/60 dark:border-slate-800/60 space-y-2">
+        <div class="flex items-center gap-3 px-3 py-2">
+          <div class="w-8 h-8 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400 flex items-center justify-center text-sm font-bold">A</div>
+          <div class="flex-1 min-w-0">
+            <p id="sidebar-username" class="text-sm font-semibold text-slate-700 dark:text-slate-200 truncate">Admin</p>
+            <p class="text-xs text-slate-400 dark:text-slate-500">Administrator</p>
+          </div>
+        </div>
+        <div class="flex gap-2">
+          <button id="dark-mode-toggle" class="flex-1 px-3 py-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5">
+            <span id="dark-mode-icon"></span>
+            <span id="dark-mode-label">Tema</span>
+          </button>
+          <button id="btn-logout" class="flex-1 px-3 py-2 rounded-lg bg-red-50 dark:bg-red-950/50 hover:bg-red-100 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 text-xs font-medium transition-all cursor-pointer flex items-center justify-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+            <span>Keluar</span>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ─── Main Content Area ────────────────────────── -->
+    <div class="flex-1 flex flex-col min-h-screen">
+
+      <!-- Top Bar (Mobile menu button + breadcrumb) -->
+      <header class="sticky top-0 z-40 backdrop-blur-xl bg-white/80 dark:bg-slate-900/80 border-b border-slate-200/60 dark:border-slate-800/60 shadow-sm">
+        <div class="px-4 sm:px-6 py-3.5 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <!-- Mobile menu toggle -->
+            <button id="mobile-menu-toggle" class="lg:hidden p-2 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-5 h-5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+              </svg>
+            </button>
+            <div>
+              <h2 id="page-title" class="text-lg font-bold text-slate-900 dark:text-white">Manajemen Kategori</h2>
+              <p id="page-subtitle" class="text-xs text-slate-500 dark:text-slate-400">Kelola kategori data statistik publik</p>
+            </div>
+          </div>
+          <a href="/" class="text-sm text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 transition-colors flex items-center gap-1.5">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+            </svg>
+            <span class="hidden sm:inline">Lihat Dashboard</span>
+          </a>
+        </div>
+      </header>
+
+      <!-- Tab Content Panels -->
+      <main class="flex-1 p-4 sm:p-6 lg:p-8">
+
+        <!-- Categories Panel -->
+        <section id="panel-categories" class="tab-panel fade-in">
+          <div id="admin-categories-root"></div>
+        </section>
+
+        <!-- Schema Panel (5.4 placeholder) -->
+        <section id="panel-schema" class="tab-panel hidden fade-in">
+          <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-12 text-center">
+            <p class="text-lg text-slate-400 font-medium">Skema Kolom — Segera hadir di tahap 5.4</p>
+          </div>
+        </section>
+
+        <!-- Records Panel (5.5 placeholder) -->
+        <section id="panel-records" class="tab-panel hidden fade-in">
+          <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-12 text-center">
+            <p class="text-lg text-slate-400 font-medium">Data Record — Segera hadir di tahap 5.5</p>
+          </div>
+        </section>
+
+        <!-- Charts Panel (5.6 placeholder) -->
+        <section id="panel-charts" class="tab-panel hidden fade-in">
+          <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-2xl p-12 text-center">
+            <p class="text-lg text-slate-400 font-medium">Konfigurasi Chart — Segera hadir di tahap 5.6</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ─── Modal Container (shared by all tabs) ───── -->
+  <div id="modal-overlay" class="hidden fixed inset-0 z-50 modal-backdrop flex items-center justify-center p-4">
+    <div id="modal-content" class="w-full max-w-lg bg-white dark:bg-slate-900 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl shadow-2xl overflow-hidden fade-in">
+      <div id="modal-header" class="px-6 py-4 border-b border-slate-200/60 dark:border-slate-800/60 flex items-center justify-between">
+        <h3 id="modal-title" class="text-lg font-bold text-slate-900 dark:text-white"></h3>
+        <button id="modal-close-btn" class="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 transition-colors cursor-pointer">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      <div id="modal-body" class="px-6 py-5"></div>
+      <div id="modal-footer" class="px-6 py-4 border-t border-slate-200/60 dark:border-slate-800/60 flex justify-end gap-3"></div>
+    </div>
+  </div>
+
+  <!-- ─── JS Modules ────────────────────────────────── -->
+  <script type="module" src="/js/admin.js"></script>
+</body>
+
+</html>

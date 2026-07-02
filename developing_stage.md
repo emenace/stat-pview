@@ -114,15 +114,15 @@ As developers or AI agents complete each task, change the markdown checkbox from
 ## Stage 5: Admin Management Portal (Admin Role)
 *Goal: Build the authenticated Admin management suite for Category CRUD, Custom Schema Building, Row Editing, and Chart Customization.*
 
-- [ ] **5.1 Auth & Login Portal (`/public/login.html` & `/public/js/login.js`)**:
-  - [ ] Build sleek, glassmorphic login card with username/password inputs and error message display.
-  - [ ] Handle login form submission, store role status, and redirect Admins to `/public/admin.html`.
-- [ ] **5.2 Admin Dashboard Layout (`/public/admin.html`)**:
-  - [ ] Build Admin sidebar/navbar with tabbed management sections: *Categories*, *Schema Builder*, *Data Records*, and *Chart Config*.
-  - [ ] Add session verification check on page load; redirect unauthenticated users back to `login.html`.
-- [ ] **5.3 Category Manager Modal & UI (`/public/js/admin-categories.js`)**:
-  - [ ] Create interactive table listing all categories with Edit and Delete action buttons.
-  - [ ] Build modal dialog form to create or update categories (Name, Description, Icon selector, Color Theme picker).
+- [x] **5.1 Auth & Login Portal (`/public/login.html` & `/public/js/login.js`)**:
+  - [x] Build sleek, glassmorphic login card with username/password inputs and error message display.
+  - [x] Handle login form submission, store role status, and redirect Admins to `/public/admin.html`.
+- [x] **5.2 Admin Dashboard Layout (`/public/admin.html`)**:
+  - [x] Build Admin sidebar/navbar with tabbed management sections: *Categories*, *Schema Builder*, *Data Records*, and *Chart Config*.
+  - [x] Add session verification check on page load; redirect unauthenticated users back to `login.html`.
+- [x] **5.3 Category Manager Modal & UI (`/public/js/admin-categories.js`)**:
+  - [x] Create interactive table listing all categories with Edit and Delete action buttons.
+  - [x] Build modal dialog form to create or update categories (Name, Description, Icon selector, Color Theme picker).
 - [ ] **5.4 Custom Table Schema Builder UI (`/public/js/admin-schema.js`)**:
   - [ ] Build schema manager where Admins select a category and view its defined custom columns.
   - [ ] Build "Add / Edit Column" modal supporting data type selection (`text`, `number`, `date`, `boolean`, `select`), label input, required checkbox, and sort order number.
