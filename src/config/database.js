@@ -124,7 +124,7 @@ function seedDefaultAccounts() {
 function seedDummyDevData() {
   const row = db.prepare('SELECT COUNT(*) as count FROM categories').get();
   if (row && row.count === 0) {
-    console.log('[Database] Dev mode & categories table empty. Seeding rich dummy dataset...');
+    console.log('[Database] Dev mode & categories table empty. Seeding rich Kemenag Metro dataset...');
 
     const insertCat = db.prepare('INSERT INTO categories (name, description, icon, color_theme) VALUES (?, ?, ?, ?)');
     const insertCol = db.prepare('INSERT INTO custom_columns (category_id, column_name, column_label, data_type, is_required, sort_order) VALUES (?, ?, ?, ?, ?, ?)');
@@ -132,41 +132,62 @@ function seedDummyDevData() {
     const insertChart = db.prepare('INSERT INTO chart_configs (category_id, chart_type, x_axis_column, y_axis_column, palette, title) VALUES (?, ?, ?, ?, ?, ?)');
 
     db.transaction(() => {
-      // Category 1: Public Transit Ridership
-      const cat1Id = insertCat.run('Public Transit Ridership 2026', 'Monthly passenger transit metrics across city networks', 'bus', 'indigo').lastInsertRowid;
-      insertCol.run(cat1Id, 'month', 'Month / Period', 'text', 1, 10);
-      insertCol.run(cat1Id, 'passengers', 'Total Passengers', 'number', 1, 20);
-      insertCol.run(cat1Id, 'on_time_pct', 'On-Time (%)', 'number', 0, 30);
+      // 1. Category: Tempat Ibadah
+      const cat1Id = insertCat.run('Tempat Ibadah Kota Metro', 'Statistik jumlah tempat ibadah berdasarkan jenis dan kecamatan di wilayah Kota Metro', 'building', 'emerald').lastInsertRowid;
+      insertCol.run(cat1Id, 'jenis', 'Jenis Tempat Ibadah', 'select', 1, 10);
+      insertCol.run(cat1Id, 'kecamatan', 'Kecamatan', 'select', 1, 20);
+      insertCol.run(cat1Id, 'jumlah', 'Jumlah Jamaah', 'number', 1, 30);
+      insertCol.run(cat1Id, 'status', 'Status Tanah', 'text', 0, 40);
 
-      const transitData = [
-        { month: 'January 2026', passengers: 142000, on_time_pct: 94.5 },
-        { month: 'February 2026', passengers: 158000, on_time_pct: 96.2 },
-        { month: 'March 2026', passengers: 167500, on_time_pct: 93.8 },
-        { month: 'April 2026', passengers: 175000, on_time_pct: 95.1 },
-        { month: 'May 2026', passengers: 183200, on_time_pct: 97.0 },
-        { month: 'June 2026', passengers: 191000, on_time_pct: 96.5 }
+      const ibadahData = [
+        { jenis: 'Masjid', kecamatan: 'Metro Pusat', jumlah: 1250, status: 'Wakaf' },
+        { jenis: 'Masjid', kecamatan: 'Metro Timur', jumlah: 980, status: 'Wakaf' },
+        { jenis: 'Masjid', kecamatan: 'Metro Barat', jumlah: 850, status: 'Wakaf' },
+        { jenis: 'Masjid', kecamatan: 'Metro Utara', jumlah: 720, status: 'Wakaf' },
+        { jenis: 'Masjid', kecamatan: 'Metro Selatan', jumlah: 640, status: 'Wakaf' },
+        { jenis: 'Gereja', kecamatan: 'Metro Pusat', jumlah: 450, status: 'Sertifikat Sendiri' },
+        { jenis: 'Gereja', kecamatan: 'Metro Timur', jumlah: 310, status: 'Sertifikat Sendiri' },
+        { jenis: 'Vihara', kecamatan: 'Metro Pusat', jumlah: 180, status: 'Sertifikat Sendiri' }
       ];
-      transitData.forEach(d => insertRec.run(cat1Id, JSON.stringify(d)));
-      insertChart.run(cat1Id, 'bar', 'month', 'passengers', 'indigo', 'Monthly Public Transit Ridership 2026');
+      ibadahData.forEach(d => insertRec.run(cat1Id, JSON.stringify(d)));
+      insertChart.run(cat1Id, 'bar', 'kecamatan', 'jumlah', 'emerald', 'Jumlah Jamaah Tempat Ibadah per Kecamatan');
 
-      // Category 2: Education Funding Distribution
-      const cat2Id = insertCat.run('City Education Funding Distribution', 'Annual budget allocation by municipal school districts', 'academic-cap', 'emerald').lastInsertRowid;
-      insertCol.run(cat2Id, 'district', 'School District / Area', 'text', 1, 10);
-      insertCol.run(cat2Id, 'budget_allocation', 'Budget Allocation (Million IDR)', 'number', 1, 20);
-      insertCol.run(cat2Id, 'beneficiary_schools', 'Beneficiary Schools Count', 'number', 1, 30);
+      // 2. Category: Tanah Wakaf
+      const cat2Id = insertCat.run('Tanah Wakaf Kota Metro', 'Data aset tanah wakaf berdasarkan kecamatan, luas lahan, dan peruntukannya', 'map', 'emerald').lastInsertRowid;
+      insertCol.run(cat2Id, 'kecamatan', 'Kecamatan', 'select', 1, 10);
+      insertCol.run(cat2Id, 'luas', 'Luas Lahan (m²)', 'number', 1, 20);
+      insertCol.run(cat2Id, 'peruntukan', 'Peruntukan', 'select', 1, 30);
+      insertCol.run(cat2Id, 'wakif', 'Nama Wakif', 'text', 0, 40);
 
-      const eduData = [
-        { district: 'Metro Pusat', budget_allocation: 4500, beneficiary_schools: 24 },
-        { district: 'Metro Barat', budget_allocation: 3200, beneficiary_schools: 18 },
-        { district: 'Metro Timur', budget_allocation: 3800, beneficiary_schools: 21 },
-        { district: 'Metro Utara', budget_allocation: 2900, beneficiary_schools: 15 },
-        { district: 'Metro Selatan', budget_allocation: 3100, beneficiary_schools: 16 }
+      const wakafData = [
+        { kecamatan: 'Metro Pusat', luas: 2500, peruntukan: 'Masjid', wakif: 'H. Abdullah' },
+        { kecamatan: 'Metro Timur', luas: 4200, peruntukan: 'Pendidikan', wakif: 'Hj. Siti Rahma' },
+        { kecamatan: 'Metro Barat', luas: 1800, peruntukan: 'Mushola', wakif: 'H. Suherman' },
+        { kecamatan: 'Metro Utara', luas: 3500, peruntukan: 'Pondok Pesantren', wakif: 'K.H. Ahmad Dahlan' },
+        { kecamatan: 'Metro Selatan', luas: 1200, peruntukan: 'Makam / TPU', wakif: 'Keluarga Besar Sukirman' },
+        { kecamatan: 'Metro Pusat', luas: 3000, peruntukan: 'Pendidikan', wakif: 'Yayasan Al-Ikhlas' }
       ];
-      eduData.forEach(d => insertRec.run(cat2Id, JSON.stringify(d)));
-      insertChart.run(cat2Id, 'pie', 'district', 'budget_allocation', 'emerald', 'Education Funding Allocation by District');
+      wakafData.forEach(d => insertRec.run(cat2Id, JSON.stringify(d)));
+      insertChart.run(cat2Id, 'pie', 'peruntukan', 'luas', 'emerald', 'Distribusi Luas Tanah Wakaf berdasarkan Peruntukan (m²)');
+
+      // 3. Category: Pencatatan Pernikahan (5 KUA Kecamatan, only 5 records)
+      const cat3Id = insertCat.run('Pencatatan Pernikahan KUA', 'Statistik jumlah pernikahan yang tercatat pada 5 KUA Kecamatan se-Kota Metro tahun 2026', 'users', 'emerald').lastInsertRowid;
+      insertCol.run(cat3Id, 'kua', 'KUA Kecamatan', 'select', 1, 10);
+      insertCol.run(cat3Id, 'jumlah', 'Jumlah Pernikahan', 'number', 1, 20);
+      insertCol.run(cat3Id, 'bulan', 'Periode', 'text', 1, 30);
+
+      const nikahData = [
+        { kua: 'KUA Metro Pusat', jumlah: 145, bulan: 'Semester I 2026' },
+        { kua: 'KUA Metro Timur', jumlah: 132, bulan: 'Semester I 2026' },
+        { kua: 'KUA Metro Barat', jumlah: 98, bulan: 'Semester I 2026' },
+        { kua: 'KUA Metro Utara', jumlah: 85, bulan: 'Semester I 2026' },
+        { kua: 'KUA Metro Selatan', jumlah: 76, bulan: 'Semester I 2026' }
+      ];
+      nikahData.forEach(d => insertRec.run(cat3Id, JSON.stringify(d)));
+      insertChart.run(cat3Id, 'bar', 'kua', 'jumlah', 'emerald', 'Jumlah Pernikahan Terdaftar per KUA Kecamatan');
     })();
 
-    console.log('[Database] Dummy dataset seeded: 2 categories, 6 custom columns, 11 records, 2 chart configs.');
+    console.log('[Database] Dummy Kemenag Metro dataset seeded: 3 categories, 11 custom columns, 19 records, 3 chart configs.');
   }
 }
 
