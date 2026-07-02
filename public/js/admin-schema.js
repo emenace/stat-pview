@@ -228,29 +228,6 @@ function renderColumnsTable(container) {
           return `<code class="px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-xs font-mono border border-slate-200/60 dark:border-slate-700/60">${cell.getValue()}</code>`;
         }
       },
-      { 
-        title: 'Tipe Data', 
-        field: 'data_type', 
-        width: 170,
-        hozAlign: 'center',
-        formatter: function(cell) {
-          const val = cell.getValue();
-          const meta = DATA_TYPE_LABELS[val] || { label: val, badge: 'bg-slate-100 text-slate-600' };
-          return `<span class="inline-block px-2.5 py-1 rounded-md text-xs font-semibold border ${meta.badge}">${meta.label.split(' (')[0]}</span>`;
-        }
-      },
-      { 
-        title: 'Status Wajib', 
-        field: 'is_required', 
-        width: 130,
-        hozAlign: 'center',
-        formatter: function(cell) {
-          const req = cell.getValue() === 1;
-          return req 
-            ? `<span class="inline-flex items-center gap-1 text-xs font-semibold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/50 px-2 py-0.5 rounded border border-red-200 dark:border-red-800/50"><svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"/></svg> Wajib</span>`
-            : `<span class="text-xs font-medium text-slate-400 dark:text-slate-500">Opsional</span>`;
-        }
-      },
       {
         title: 'Aksi',
         field: 'id',
@@ -291,17 +268,12 @@ function openColumnModal(column) {
   const isEdit = !!column;
   const title = isEdit ? 'Edit Kolom Kustom' : 'Tambah Kolom Baru';
 
-  // Calculate default sort order if adding new column
-  let defaultSortOrder = 10;
+  // Calculate default sort order if adding new column (auto-increment by 1)
+  let defaultSortOrder = 1;
   if (!isEdit && columnsData.length > 0) {
     const maxOrder = Math.max(...columnsData.map(c => c.sort_order || 0));
-    defaultSortOrder = maxOrder + 10;
+    defaultSortOrder = maxOrder + 1;
   }
-
-  const typeOptionsHtml = Object.entries(DATA_TYPE_LABELS).map(([key, val]) => {
-    const selected = (column && column.data_type === key) ? 'selected' : (!column && key === 'text' ? 'selected' : '');
-    return `<option value="${key}" ${selected}>${val.label}</option>`;
-  }).join('');
 
   const bodyHtml = `
     <form id="column-form" class="space-y-4">
@@ -318,35 +290,12 @@ function openColumnModal(column) {
         <input type="text" id="col-name" required placeholder="Contoh: luas_tanah"
           value="${isEdit ? column.column_name : ''}" ${isEdit ? 'readonly' : ''}
           class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all ${isEdit ? 'opacity-70 cursor-not-allowed bg-slate-100 dark:bg-slate-800' : ''}" />
-        <p class="text-xs text-slate-400 mt-1">${isEdit ? 'Nama sistem tidak dapat diubah setelah kolom dibuat.' : 'Gunakan huruf kecil dan garis bawah (_) tanpa spasi.'}</p>
+        <p class="text-xs text-slate-400 mt-1">${isEdit ? 'Nama sistem tidak dapat diubah setelah kolom dibuat.' : 'Otomatis dibuat berdasarkan label kolom di atas.'}</p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Tipe Data <span class="text-red-500">*</span></label>
-          <select id="col-type"
-            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm cursor-pointer">
-            ${typeOptionsHtml}
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5">Nomor Urut</label>
-          <input type="number" id="col-sort" required min="0" step="1"
-            value="${isEdit ? (column.sort_order || 0) : defaultSortOrder}"
-            class="w-full px-4 py-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all text-sm" />
-        </div>
-      </div>
-
-      <div class="pt-2">
-        <label class="relative flex items-center gap-3 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 cursor-pointer hover:bg-slate-100/80 dark:hover:bg-slate-800 transition-colors">
-          <input type="checkbox" id="col-required" class="w-5 h-5 rounded text-emerald-600 focus:ring-emerald-500 border-slate-300 dark:border-slate-600 cursor-pointer"
-            ${(column && column.is_required) ? 'checked' : ''} />
-          <div>
-            <span class="text-sm font-semibold text-slate-800 dark:text-slate-200">Wajib Diisi (Required)</span>
-            <p class="text-xs text-slate-500 dark:text-slate-400">Jika diaktifkan, admin tidak dapat menyimpan record tanpa mengisi kolom ini.</p>
-          </div>
-        </label>
-      </div>
+      <input type="hidden" id="col-type" value="${isEdit ? (column.data_type || 'text') : 'text'}" />
+      <input type="hidden" id="col-sort" value="${isEdit ? (column.sort_order || 0) : defaultSortOrder}" />
+      <input type="hidden" id="col-required" value="0" />
     </form>
   `;
 
@@ -379,9 +328,12 @@ function openColumnModal(column) {
   document.getElementById('modal-save').addEventListener('click', async () => {
     const label = document.getElementById('col-label').value.trim();
     const name = document.getElementById('col-name').value.trim().toLowerCase().replace(/\s+/g, '_');
-    const dataType = document.getElementById('col-type').value;
-    const sortOrder = parseInt(document.getElementById('col-sort').value) || 0;
-    const isRequired = document.getElementById('col-required').checked ? 1 : 0;
+    const dataTypeEl = document.getElementById('col-type');
+    const dataType = dataTypeEl ? dataTypeEl.value : 'text';
+    const sortOrderEl = document.getElementById('col-sort');
+    const sortOrder = sortOrderEl ? (parseInt(sortOrderEl.value) || 0) : 1;
+    const reqEl = document.getElementById('col-required');
+    const isRequired = reqEl ? (reqEl.checked || reqEl.value === '1' ? 1 : 0) : 0;
 
     if (!label || !name) {
       showToast('Label kolom dan nama sistem wajib diisi.', 'warning');
