@@ -6,6 +6,7 @@
 import { authMe, authLogout, showToast } from './api-service.js';
 import { initCategoryManager } from './admin-categories.js';
 import { initSchemaManager } from './admin-schema.js';
+import { initRecordManager } from './admin-records.js';
 
 let currentTab = 'categories';
 
@@ -94,6 +95,8 @@ function switchTab(tabName) {
     initCategoryManager();
   } else if (tabName === 'schema') {
     initSchemaManager();
+  } else if (tabName === 'records') {
+    initRecordManager();
   }
 }
 

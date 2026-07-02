@@ -128,10 +128,10 @@ As developers or AI agents complete each task, change the markdown checkbox from
   - [x] Build schema manager with cascaded selectors where Admins select a Category and Sub-Category to view defined custom columns.
   - [x] Build "Add / Edit Column" modal supporting data type selection (`text`, `number`, `date`, `boolean`, `select`), label input, required checkbox, and sort order number bound to `sub_category_id`.
   - [x] Implement column reordering and deletion with safety confirmation prompts.
-- [ ] **5.5 Dynamic Data Row Editor (`/public/js/admin-records.js`)**:
-  - [ ] Build record management table displaying JSON data rows for the selected sub-category.
-  - [ ] **Dynamic Form Generator**: Write JS logic that reads the sub-category's `custom_columns` and dynamically builds the exact HTML form inputs (`<input type="number">`, `<input type="date">`, `<select>`, etc.) inside the "Add/Edit Record" modal!
-  - [ ] Implement record insertion, modification, and deletion API bindings linked to `sub_category_id`.
+- [x] **5.5 Dynamic Data Row Editor (`/public/js/admin-records.js`)**:
+  - [x] Build record management table displaying JSON data rows for the selected sub-category.
+  - [x] **Dynamic Form Generator**: Write JS logic that reads the sub-category's `custom_columns` and dynamically builds the exact HTML form inputs (`<input type="number">`, `<input type="date">`, `<select>`, etc.) inside the "Add/Edit Record" modal!
+  - [x] Implement record insertion, modification, and deletion API bindings linked to `sub_category_id`.
 - [ ] **5.6 Live Preview Chart Customizer (`/public/js/admin-charts.js`)**:
   - [ ] Build chart configurator form with live-updating Chart.js preview canvas.
   - [ ] Build dropdowns populated with the sub-category's `custom_columns` to allow mapping X-Axis labels and Y-Axis numeric values.
