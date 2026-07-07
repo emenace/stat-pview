@@ -57,6 +57,10 @@ export class SqliteStore extends session.Store {
     }
   }
 
+  touch(sid, sess, cb) {
+    this.set(sid, sess, cb);
+  }
+
   destroy(sid, cb) {
     try {
       this.destroyStmt.run(sid);

@@ -26,9 +26,12 @@ const app = express();
 const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
 
+// Trust first proxy (Nginx, Cloudflare, Apache, PM2 cluster) so secure cookies work properly
+app.set('trust proxy', 1);
+
 // Core Middlewares
 app.use(cors({
-  origin: isProd ? process.env.FRONTEND_URL : 'http://localhost:3001',
+  origin: true, // Dynamically mirror request origin to guarantee CORS credentials/cookies are accepted
   credentials: true
 }));
 app.use(express.json());
@@ -44,7 +47,7 @@ app.use(session({
   rolling: true,
   cookie: {
     httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
+    secure: 'auto', // Auto-detect HTTPS/HTTP so cookies work both behind Nginx SSL and direct port access
     sameSite: 'lax',
     maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
   }
