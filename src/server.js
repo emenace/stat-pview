@@ -4,6 +4,7 @@ import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import session from 'express-session';
+import { SqliteStore } from './config/session_store.js';
 
 import { initDatabase } from './config/database.js';
 import authRoutes from './routes/auth_routes.js';
@@ -23,10 +24,11 @@ initDatabase();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const isProd = process.env.NODE_ENV === 'production';
 
 // Core Middlewares
 app.use(cors({
-  origin: true,
+  origin: isProd ? process.env.FRONTEND_URL : 'http://localhost:3000',
   credentials: true
 }));
 app.use(express.json());
@@ -36,12 +38,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use(session({
   name: 'stat_session',
   secret: process.env.SESSION_SECRET || 'stat_public_view_secret_key_2026',
+  store: new SqliteStore(),
   resave: false,
   saveUninitialized: false,
+  rolling: true,
   cookie: {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    maxAge: 1000 * 60 * 60 * 24 // 24 hours
+    sameSite: 'lax',
+    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
   }
 }));
 
