@@ -2,7 +2,7 @@ import { getChartConfigBySubCategory, upsertChartConfig } from '../models/chart_
 import { getSubCategoryById } from '../models/subcategory_model.js';
 import { extractChartData } from '../models/record_model.js';
 
-const VALID_CHART_TYPES = ['bar', 'line', 'pie', 'doughnut', 'area'];
+const VALID_CHART_TYPES = ['bar', 'line', 'pie', 'doughnut', 'area', 'none'];
 
 /**
  * GET /api/charts/:sub_category_id — Get chart config and pre-extracted data (Public)

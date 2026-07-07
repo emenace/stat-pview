@@ -269,7 +269,7 @@ async function loadSubCategoryData(subCategoryId) {
     hideEmptyState();
 
     // Render chart (use emerald as default palette)
-    if (chartConfig && chartConfig.config) {
+    if (chartConfig && chartConfig.config && chartConfig.config.chart_type !== 'none') {
       document.getElementById('chart-section').classList.remove('hidden');
       const palette = chartConfig.config.palette === 'default' ? 'emerald' : chartConfig.config.palette;
       renderChart('stats-chart', chartConfig.config, chartConfig.chartData, palette);

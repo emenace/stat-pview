@@ -61,26 +61,30 @@ function renderChartShell() {
 
           <div>
             <label class="block text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-1.5">Tipe Visualisasi</label>
-            <div class="grid grid-cols-3 gap-2" id="cfg-type-pills">
-              <button type="button" data-type="bar" class="chart-type-pill py-2 px-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all">
+            <div class="flex flex-wrap gap-2" id="cfg-type-pills">
+              <button type="button" data-type="bar" class="chart-type-pill py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125C3 12.504 3.504 12 4.125 12h2.25c.621 0 1.125.504 1.125 1.125v6.75C7.5 20.496 6.996 21 6.375 21h-2.25A1.125 1.125 0 013 19.875v-6.75zM9.75 8.625c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125v11.25c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V8.625zM16.5 4.125c0-.621.504-1.125 1.125-1.125h2.25C20.496 3 21 3.504 21 4.125v15.75c0 .621-.504 1.125-1.125 1.125h-2.25a1.125 1.125 0 01-1.125-1.125V4.125z" /></svg>
-                <span>Bar Chart</span>
+                <span>Diagram Batang</span>
               </button>
-              <button type="button" data-type="line" class="chart-type-pill py-2 px-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all">
+              <button type="button" data-type="line" class="chart-type-pill py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" /></svg>
-                <span>Line Chart</span>
+                <span>Diagram Garis</span>
               </button>
-              <button type="button" data-type="area" class="chart-type-pill py-2 px-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all">
+              <button type="button" data-type="area" class="chart-type-pill py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M3 13.125L9 8.25l4.5 4.5 7.5-6.75v12a1.5 1.5 0 01-1.5 1.5H4.5A1.5 1.5 0 013 18v-4.875z" /></svg>
-                <span>Area Chart</span>
+                <span>Diagram Area</span>
               </button>
-              <button type="button" data-type="pie" class="chart-type-pill py-2 px-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all">
+              <button type="button" data-type="pie" class="chart-type-pill py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M10.5 6a7.5 7.5 0 107.5 7.5h-7.5V6z" /></svg>
-                <span>Pie Chart</span>
+                <span>Diagram Lingkaran</span>
               </button>
-              <button type="button" data-type="doughnut" class="chart-type-pill py-2 px-3 rounded-xl border text-xs font-semibold flex flex-col items-center gap-1 transition-all col-span-2">
+              <button type="button" data-type="doughnut" class="chart-type-pill py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4"><path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /><path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" /></svg>
-                <span>Doughnut Chart</span>
+                <span>Diagram Cincin</span>
+              </button>
+              <button type="button" data-type="none" class="chart-type-pill py-1.5 px-3 rounded-xl border text-xs font-semibold flex items-center gap-1.5 transition-all">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" class="w-4 h-4 text-rose-500"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                <span>Tanpa Diagram</span>
               </button>
             </div>
             <input type="hidden" id="cfg-type" value="bar">
@@ -128,7 +132,7 @@ function renderChartShell() {
           <span class="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-md" id="preview-data-status">Memuat data...</span>
         </div>
 
-        <div class="flex-1 relative flex items-center justify-center min-h-[350px]">
+        <div class="flex-1 relative flex items-center justify-center min-h-[350px]" id="preview-canvas-wrapper">
           <canvas id="admin-chart-preview-canvas" class="w-full h-full max-h-[380px]"></canvas>
         </div>
 
@@ -177,7 +181,7 @@ async function loadCategoriesForCharts() {
         subSel.disabled = true;
       } else {
         subSel.innerHTML = '<option value="">— Pilih Sub-Kategori —</option>' +
-          subs.map(s => `<option value="${s.id}">${s.title}</option>`).join('');
+          subs.map(s => `<option value="${s.id}">${s.name || s.title}</option>`).join('');
         subSel.disabled = false;
       }
     });
@@ -248,7 +252,7 @@ function populateConfigForm(subCatId) {
   let defaultTitle = 'Grafik Statistik';
   const cat = categoriesData.find(c => String(c.id) === String(selectedCategoryId));
   const sub = cat?.sub_categories?.find(s => String(s.id) === String(subCatId));
-  if (sub) defaultTitle = `Grafik ${sub.title}`;
+  if (sub) defaultTitle = `Grafik ${sub.name || sub.title}`;
 
   titleInput.value = currentConfig?.title || defaultTitle;
   typeInput.value = currentConfig?.chart_type || 'bar';
@@ -329,9 +333,9 @@ function bindConfigFormEvents(subCatId) {
 function updateTypePillsUI(activeType) {
   document.querySelectorAll('.chart-type-pill').forEach(pill => {
     if (pill.getAttribute('data-type') === activeType) {
-      pill.className = 'chart-type-pill py-2.5 px-3 rounded-xl border border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold flex flex-col items-center gap-1 shadow-sm transition-all cursor-pointer';
+      pill.className = 'chart-type-pill py-1.5 px-3 rounded-xl border border-emerald-500 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 font-bold flex items-center gap-1.5 shadow-sm transition-all cursor-pointer text-xs';
     } else {
-      pill.className = 'chart-type-pill py-2.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 flex flex-col items-center gap-1 transition-all cursor-pointer';
+      pill.className = 'chart-type-pill py-1.5 px-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30 text-slate-500 dark:text-slate-400 font-medium hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-1.5 transition-all cursor-pointer text-xs';
     }
   });
 }
@@ -344,6 +348,33 @@ function updateLivePreview() {
   const yCol = document.getElementById('cfg-y-col')?.value;
   const palette = document.getElementById('cfg-palette')?.value || 'emerald';
   const statusEl = document.getElementById('preview-data-status');
+  const canvasWrapper = document.getElementById('preview-canvas-wrapper');
+  let disabledMsgEl = document.getElementById('chart-preview-disabled-msg');
+
+  if (type === 'none') {
+    destroyChart();
+    if (canvasWrapper) canvasWrapper.classList.add('hidden');
+    if (!disabledMsgEl && canvasWrapper?.parentElement) {
+      disabledMsgEl = document.createElement('div');
+      disabledMsgEl.id = 'chart-preview-disabled-msg';
+      disabledMsgEl.className = 'flex-1 flex flex-col items-center justify-center text-center p-8 text-slate-400 min-h-[350px] fade-in';
+      disabledMsgEl.innerHTML = `
+        <div class="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center mb-3 text-rose-500">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-6 h-6"><path stroke-linecap="round" stroke-linejoin="round" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+        </div>
+        <p class="font-bold text-slate-700 dark:text-slate-200 text-sm">Tanpa Diagram (Grafik Dinonaktifkan)</p>
+        <p class="text-xs text-slate-400 mt-1 max-w-xs">Pada halaman dashboard publik, kotak diagram tidak akan ditampilkan untuk sub-kategori ini.</p>
+      `;
+      canvasWrapper.parentElement.insertBefore(disabledMsgEl, canvasWrapper);
+    } else if (disabledMsgEl) {
+      disabledMsgEl.classList.remove('hidden');
+    }
+    if (statusEl) statusEl.textContent = 'Diagram dinonaktifkan';
+    return;
+  } else {
+    if (canvasWrapper) canvasWrapper.classList.remove('hidden');
+    if (disabledMsgEl) disabledMsgEl.classList.add('hidden');
+  }
 
   let labels = [];
   let values = [];
