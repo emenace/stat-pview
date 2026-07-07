@@ -1,6 +1,6 @@
 import db from '../config/database.js';
 
-const VALID_CHART_TYPES = ['bar', 'line', 'pie', 'doughnut', 'area'];
+const VALID_CHART_TYPES = ['bar', 'line', 'pie', 'doughnut', 'area', 'none'];
 
 /**
  * Get chart configuration for a sub-category

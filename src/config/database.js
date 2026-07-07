@@ -98,7 +98,7 @@ export function initDatabase() {
     CREATE TABLE IF NOT EXISTS chart_configs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       sub_category_id INTEGER UNIQUE NOT NULL,
-      chart_type TEXT CHECK(chart_type IN ('bar', 'line', 'pie', 'doughnut', 'area')) DEFAULT 'bar',
+      chart_type TEXT CHECK(chart_type IN ('bar', 'line', 'pie', 'doughnut', 'area', 'none')) DEFAULT 'bar',
       x_axis_column TEXT,
       y_axis_column TEXT,
       group_by_column TEXT,
@@ -107,6 +107,33 @@ export function initDatabase() {
       FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id) ON DELETE CASCADE
     );
   `);
+
+  // ── Migration: Rebuild chart_configs to add 'none' to chart_type CHECK constraint ──
+  try {
+    const tableInfo = db.prepare("SELECT sql FROM sqlite_master WHERE type='table' AND name='chart_configs'").get();
+    if (tableInfo && tableInfo.sql && !tableInfo.sql.includes("'none'")) {
+      console.log('[Database] Migrating chart_configs to allow chart_type = none...');
+      db.exec(`
+        CREATE TABLE IF NOT EXISTS chart_configs_new (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          sub_category_id INTEGER UNIQUE NOT NULL,
+          chart_type TEXT CHECK(chart_type IN ('bar', 'line', 'pie', 'doughnut', 'area', 'none')) DEFAULT 'bar',
+          x_axis_column TEXT,
+          y_axis_column TEXT,
+          group_by_column TEXT,
+          palette TEXT DEFAULT 'emerald',
+          title TEXT,
+          FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id) ON DELETE CASCADE
+        );
+        INSERT INTO chart_configs_new SELECT * FROM chart_configs;
+        DROP TABLE chart_configs;
+        ALTER TABLE chart_configs_new RENAME TO chart_configs;
+      `);
+      console.log('[Database] chart_configs migration complete.');
+    }
+  } catch (migErr) {
+    console.warn('[Database] chart_configs migration skipped or failed:', migErr.message);
+  }
 
   console.log('[Database] Tables and indices verified successfully.');
   seedDefaultAccounts();
