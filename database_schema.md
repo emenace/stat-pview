@@ -152,7 +152,7 @@ Stores visualization preferences for how a sub-category's data should be charted
 CREATE TABLE IF NOT EXISTS chart_configs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     sub_category_id INTEGER UNIQUE NOT NULL,
-    chart_type TEXT CHECK(chart_type IN ('bar', 'line', 'pie', 'doughnut', 'area')) DEFAULT 'bar',
+    chart_type TEXT CHECK(chart_type IN ('bar', 'line', 'pie', 'doughnut', 'area', 'none')) DEFAULT 'bar',
     x_axis_column TEXT,
     y_axis_column TEXT,
     group_by_column TEXT,
@@ -160,6 +160,17 @@ CREATE TABLE IF NOT EXISTS chart_configs (
     title TEXT,
     FOREIGN KEY (sub_category_id) REFERENCES sub_categories(id) ON DELETE CASCADE
 );
+```
+
+### 2.7 Session Storage Table (`sessions`)
+Stores active admin login sessions for express-session persistence across server restarts and clustering.
+```sql
+CREATE TABLE IF NOT EXISTS sessions (
+    sid TEXT PRIMARY KEY,
+    expired INTEGER NOT NULL,
+    sess TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_sessions_expired ON sessions(expired);
 ```
 
 ---

@@ -137,22 +137,29 @@ As developers or AI agents complete each task, change the markdown checkbox from
 - [x] **5.6 Live Preview Chart Customizer (`/public/js/admin-charts.js`)**:
   - [x] Build chart configurator form with live-updating Chart.js preview canvas.
   - [x] Build dropdowns populated with the sub-category's `custom_columns` to allow mapping X-Axis labels and Y-Axis numeric values.
-  - [x] Allow switching chart type (`bar`, `line`, `pie`, `doughnut`, `area`) and picking color themes, saving preferences to `/api/charts/:id`.
+  - [x] Allow switching chart type (`bar`, `line`, `pie`, `doughnut`, `area`, `none` / "Tanpa Diagram") and picking color themes, saving preferences to `/api/charts/:id`.
+  - [x] Synchronize 15 modern Heroicons across Admin Category Settings and Public Dashboard with backwards-compatibility alias mapping.
 
 ---
 
 ## Stage 6: Polish, Performance Optimization & Final Verification
 *Goal: Conduct rigorous end-to-end testing, optimize responsive styling, and prepare the codebase for production deployment.*
 
-- [ ] **6.1 End-to-End Role & Workflow Testing**:
+- [x] **6.1 Production Environment & Deployment Configuration**:
+  - [x] **Environment Management**: Created `.env` and `.env.example` for configuring `PORT` (default `3001`), `NODE_ENV`, `FRONTEND_URL`, `SESSION_SECRET`, and default account credentials.
+  - [x] **Persistent Session Storage**: Implemented `SqliteStore` (`src/config/session_store.js`) with `better-sqlite3` to persist admin logins across server restarts and eliminate `MemoryStore` warnings.
+  - [x] **Reverse Proxy & Cookie Reliability**: Configured `app.set('trust proxy', 1)` and `secure: 'auto'` with `rolling: true` and 7-day `maxAge` so sessions persist reliably behind Nginx/Cloudflare and PM2 in production.
+  - [x] **PM2 Cluster Deployment**: Added `ecosystem.config.cjs` to run Node.js in cluster mode utilizing max CPU instances with automated log merging and memory limits.
+  - [x] **Development Data Seeding**: Created `seed-dev.js` script for on-demand truncation and seeding of sub-categories, schemas, 10 data records each, and charts.
+- [ ] **6.2 End-to-End Role & Workflow Testing**:
   - [ ] Perform complete Admin workflow: Create category -> Define 4 custom columns -> Insert 10 realistic data rows -> Configure Bar Chart -> Verify instant reflection on Public Dashboard.
   - [ ] Test role security: Ensure unauthenticated users or guest roles receive `401/403` when attempting to access `/api/records` via POST/PUT/DELETE.
-- [ ] **6.2 Responsive UI/UX Audit**:
+- [ ] **6.3 Responsive UI/UX Audit**:
   - [ ] Audit all tables on mobile viewport widths (375px - 768px) to verify Tabulator horizontal scrolling or responsive collapsing works without breaking page containers.
   - [ ] Check micro-animations, hover states, and color contrast ratios across dark and light themes.
-- [ ] **6.3 SQLite & JSON Query Performance**:
+- [ ] **6.4 SQLite & JSON Query Performance**:
   - [ ] Check database integrity and verify SQLite indexing on `category_id` and JSON paths.
   - [ ] Test system stability under rapid switching between categories.
-- [ ] **6.4 Final Documentation & Handover**:
-  - [ ] Verify `README.md`, `api_spec.md`, and `database_schema.md` accurately reflect the final implemented codebase.
+- [ ] **6.5 Final Documentation & Handover**:
+  - [x] Verify `README.md`, `api_spec.md`, and `database_schema.md` accurately reflect the final implemented codebase.
   - [ ] Perform final code cleanup, removing any console logs or development scratch files.

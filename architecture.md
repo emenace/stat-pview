@@ -62,6 +62,8 @@ The backend follows a strict **Model-View-Controller (MVC) / Layered Architectur
   * `adminOnly.js`: Ensures `req.session.user.role === 'admin'` before allowing state-mutating requests.
 * **Controllers (`/src/controllers`)**: Handle HTTP requests, parse payloads, validate input formats, coordinate model calls, and return structured JSON responses.
 * **Models (`/src/models`)**: Encapsulate all SQLite database interactions using parameterized queries.
+* **Persistent Session Storage (`/src/config/session_store.js`)**: Implements a custom vanilla `SqliteStore` backed by `better-sqlite3`. Unlike `MemoryStore`, it stores sessions in an indexed SQLite table (`sessions`), ensuring admin logins survive server crashes, code restarts, and multi-process clustering.
+* **Production Deployment & Proxy Trust**: Configured with `app.set('trust proxy', 1)` and `secure: 'auto'` in `server.js` to guarantee reliable cookie transmission behind reverse proxies (Nginx, Cloudflare, Apache). PM2 deployment is managed via `ecosystem.config.cjs` in cluster mode utilizing all available CPU cores.
 
 ### 2.2 Authentication Flow
 ```mermaid

@@ -49,6 +49,9 @@ stat-pview/
 │   ├── index.html         # Main public dashboard view
 │   ├── login.html         # User/Admin authentication page
 │   └── admin.html         # Admin CRUD & schema builder management portal
+├── .env.example           # Template environment configuration file (PORT, NODE_ENV, FRONTEND_URL)
+├── ecosystem.config.cjs   # PM2 production cluster deployment configuration
+├── seed-dev.js            # On-demand dev seeding script (truncates data and populates 10 records per sub-category)
 ├── agents.md              # This AI Agent operational guidelines file
 ├── prd.md                 # Product Requirements Document
 ├── architecture.md        # System Architecture & Data Flow

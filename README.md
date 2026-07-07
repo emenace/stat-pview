@@ -40,33 +40,54 @@ git clone https://github.com/emenace/stat-pview.git
 npm install
 ```
 
-### 2. Running the Application
+### 2. Environment Configuration
+The application uses a `.env` file for easy configuration across development and production environments. Copy the example file to get started:
+```bash
+cp .env.example .env
+```
+Key configuration variables in `.env`:
+* `PORT`: Server port (default is `3001`)
+* `NODE_ENV`: `development` or `production`
+* `FRONTEND_URL`: Production domain for CORS allowance
+* `SESSION_SECRET`: Secret key for signing login session cookies
+* `ADMIN_USERNAME` / `ADMIN_PASSWORD`: Default administrator account credentials
 
-The application supports separate environments for development (with dummy data) and production (with clean setup and secure credentials).
+### 3. Running the Application
 
-#### A. Development Mode (Default)
-In development, a dummy database is automatically created and seeded with realistic statistical datasets (Public Transit Ridership and Education Funding Allocation) for demonstration purposes.
+The application supports separate environments for development (with dummy data) and production (with clean setup and secure credentials). All login sessions are permanently saved using a custom SQLite session store (`SqliteStore`), ensuring logins survive server restarts and work reliably behind reverse proxies (Nginx/Cloudflare/PM2).
+
+#### A. Development Mode
+In development, a dummy database is automatically created and seeded with realistic statistical datasets for demonstration purposes.
 ```bash
 npm run dev
 ```
+* **Server Port**: `http://localhost:3001`
 * **Database Location**: `data/stat-pview-dummy.sqlite` (automatically created and git-ignored).
-* **Environment**: `NODE_ENV=development`.
+* **On-Demand Data Seeding**: If you ever need to reset and populate 10 rows of dummy data across all categories:
+  ```bash
+  node seed-dev.js
+  ```
 * **Default Seeding Credentials**:
   * **Administrator**: `admin` / `admin123`
   * **Standard User / Viewer**: `user` / `user123`
 
-#### B. Production Mode
-In production, a clean database is initialized. Real administrator and viewer credentials are set via environment variables. Dummy datasets are NOT seeded.
+#### B. Production Mode (with PM2)
+In production, a clean database is initialized and real administrator credentials are set via your `.env` file. We include an official PM2 cluster configuration (`ecosystem.config.cjs`) for maximum performance, multi-core clustering, auto-restarts, and log management.
 ```bash
-npm run start:prod
-# or:
-npm start
-```
-* **Database Location**: `data/stat-pview-prod.sqlite` (git-ignored).
-* **Environment**: `NODE_ENV=production`.
-* **Configuration**: Set environment variables in a `.env` file (e.g. `ADMIN_USERNAME`, `ADMIN_PASSWORD`, `USER_USERNAME`, `USER_PASSWORD`, `SESSION_SECRET`).
+# Ensure PM2 is installed globally
+npm install -g pm2
 
-### 3. Running Automated API Tests
+# Start in production cluster mode
+pm2 start ecosystem.config.cjs --env production
+
+# Check status and logs
+pm2 list
+pm2 logs stat-pview
+```
+* **Server Port**: `http://localhost:3001` (or proxied via Nginx/Cloudflare)
+* **Database Location**: `data/stat-pview-prod.sqlite` (git-ignored).
+
+### 4. Running Automated API Tests
 A comprehensive test script is included to test all backend MVC layers, custom column schema validations, session handlers, and chart aggregations:
 ```bash
 npm run test:api
