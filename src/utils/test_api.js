@@ -1,7 +1,7 @@
 import fetch from 'node-fetch';
 import '../server.js'; // Starts the Express server in-process
 
-const BASE_URL = process.env.API_URL || 'http://localhost:3000/api';
+const BASE_URL = process.env.API_URL || 'http://localhost:3001/api';
 let authCookie = null;
 let testCategoryId = null;
 let testRecordId = null;

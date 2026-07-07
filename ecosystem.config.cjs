@@ -8,7 +8,7 @@ module.exports = {
       watch: false,           // Do not restart on file changes in production
       env_production: {
         NODE_ENV: 'production',
-        PORT: 3000
+        PORT: 3001
       },
       // Logs configuration
       log_date_format: 'YYYY-MM-DD HH:mm:ss Z',

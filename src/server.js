@@ -23,12 +23,12 @@ const __dirname = path.dirname(__filename);
 initDatabase();
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3001;
 const isProd = process.env.NODE_ENV === 'production';
 
 // Core Middlewares
 app.use(cors({
-  origin: isProd ? process.env.FRONTEND_URL : 'http://localhost:3000',
+  origin: isProd ? process.env.FRONTEND_URL : 'http://localhost:3001',
   credentials: true
 }));
 app.use(express.json());
