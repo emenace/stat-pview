@@ -69,7 +69,7 @@ function renderSchemaShell() {
 
     <!-- Table Container -->
     <div class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/60 dark:border-slate-800/60 rounded-2xl shadow-sm overflow-hidden">
-      <div id="schema-table-container" class="p-4">
+      <div id="schema-table-container" class="p-4 overflow-x-auto w-full max-w-full">
         <div class="text-center py-12 text-slate-400">
           <p class="text-base">Silakan pilih kategori dan sub-kategori terlebih dahulu di atas</p>
         </div>

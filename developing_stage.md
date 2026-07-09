@@ -154,9 +154,9 @@ As developers or AI agents complete each task, change the markdown checkbox from
 - [x] **6.2 End-to-End Role & Workflow Testing**:
   - [x] Perform complete Admin workflow: Create category -> Define 4 custom columns -> Insert 10 realistic data rows -> Configure Bar Chart -> Verify instant reflection on Public Dashboard.
   - [x] Test role security: Ensure unauthenticated users or guest roles receive `401/403` when attempting to access `/api/records` via POST/PUT/DELETE.
-- [ ] **6.3 Responsive UI/UX Audit**:
-  - [ ] Audit all tables on mobile viewport widths (375px - 768px) to verify Tabulator horizontal scrolling or responsive collapsing works without breaking page containers.
-  - [ ] Check micro-animations, hover states, and color contrast ratios across dark and light themes.
+- [x] **6.3 Responsive UI/UX Audit**:
+  - [x] Audit all tables on mobile viewport widths (375px - 768px) to verify Tabulator horizontal scrolling or responsive collapsing works without breaking page containers.
+  - [x] Check micro-animations, hover states, and color contrast ratios across dark and light themes.
 - [ ] **6.4 SQLite & JSON Query Performance**:
   - [ ] Check database integrity and verify SQLite indexing on `category_id` and JSON paths.
   - [ ] Test system stability under rapid switching between categories.
