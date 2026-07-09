@@ -94,6 +94,8 @@ export function initDatabase() {
     );
 
     CREATE INDEX IF NOT EXISTS idx_records_subcategory ON data_records(sub_category_id);
+    CREATE INDEX IF NOT EXISTS idx_subcategories_category ON sub_categories(category_id);
+    CREATE INDEX IF NOT EXISTS idx_customcols_subcategory ON custom_columns(sub_category_id);
 
     CREATE TABLE IF NOT EXISTS chart_configs (
       id INTEGER PRIMARY KEY AUTOINCREMENT,

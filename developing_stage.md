@@ -157,9 +157,9 @@ As developers or AI agents complete each task, change the markdown checkbox from
 - [x] **6.3 Responsive UI/UX Audit**:
   - [x] Audit all tables on mobile viewport widths (375px - 768px) to verify Tabulator horizontal scrolling or responsive collapsing works without breaking page containers.
   - [x] Check micro-animations, hover states, and color contrast ratios across dark and light themes.
-- [ ] **6.4 SQLite & JSON Query Performance**:
-  - [ ] Check database integrity and verify SQLite indexing on `category_id` and JSON paths.
-  - [ ] Test system stability under rapid switching between categories.
-- [ ] **6.5 Final Documentation & Handover**:
+- [x] **6.4 SQLite & JSON Query Performance**:
+  - [x] Check database integrity and verify SQLite indexing on `category_id` and JSON paths.
+  - [x] Test system stability under rapid switching between categories.
+- [x] **6.5 Final Documentation & Handover**:
   - [x] Verify `README.md`, `api_spec.md`, and `database_schema.md` accurately reflect the final implemented codebase.
-  - [ ] Perform final code cleanup, removing any console logs or development scratch files.
+  - [x] Perform final code cleanup, removing any console logs or development scratch files.
