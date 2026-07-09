@@ -68,6 +68,7 @@ npm run dev
   node seed-dev.js
   ```
 * **Default Seeding Credentials**:
+  * **Superuser (Root)**: `Root` / `pwdSTAT@123` (Configurable via `ROOT_PASSWORD` in `.env`)
   * **Administrator**: `admin` / `admin123`
   * **Standard User / Viewer**: `user` / `user123`
 

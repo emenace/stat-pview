@@ -8,6 +8,7 @@ import { SqliteStore } from './config/session_store.js';
 
 import { initDatabase } from './config/database.js';
 import authRoutes from './routes/auth_routes.js';
+import userRoutes from './routes/user_routes.js';
 import categoryRoutes from './routes/category_routes.js';
 import columnRoutes from './routes/column_routes.js';
 import recordRoutes from './routes/record_routes.js';
@@ -58,6 +59,7 @@ app.use(express.static(path.join(__dirname, '../public')));
 
 // API Routes
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
 app.use('/api/subcategories', subcategoryRoutes);
 app.use('/api/columns', columnRoutes);

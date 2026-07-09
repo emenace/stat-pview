@@ -8,6 +8,7 @@ import { initCategoryManager } from './admin-categories.js';
 import { initSchemaManager } from './admin-schema.js';
 import { initRecordManager } from './admin-records.js';
 import { initChartManager } from './admin-charts.js';
+import { initUserManager } from './admin-users.js';
 
 let currentTab = 'categories';
 
@@ -37,6 +38,10 @@ async function verifySession() {
     // Update sidebar username
     const usernameEl = document.getElementById('sidebar-username');
     if (usernameEl) usernameEl.textContent = result.user.username;
+    
+    // Store user ID/username globally for UI checks
+    window.currentAdminUser = result.user;
+    
     return true;
   } catch {
     window.location.href = '/login.html';
@@ -50,6 +55,7 @@ const TAB_META = {
   schema:     { title: 'Skema Kolom', subtitle: 'Definisikan kolom kustom untuk setiap kategori' },
   records:    { title: 'Data Record', subtitle: 'Kelola data record untuk setiap kategori' },
   charts:     { title: 'Konfigurasi Chart', subtitle: 'Atur visualisasi chart untuk setiap kategori' },
+  users:      { title: 'Manajemen User', subtitle: 'Kelola pengguna dan hak akses aplikasi' },
 };
 
 function initTabNavigation() {
@@ -100,6 +106,8 @@ function switchTab(tabName) {
     initRecordManager();
   } else if (tabName === 'charts') {
     initChartManager();
+  } else if (tabName === 'users') {
+    initUserManager();
   }
 }
 

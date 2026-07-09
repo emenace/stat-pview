@@ -146,13 +146,20 @@ export function initDatabase() {
 }
 
 /**
- * Seed default accounts if users table is empty
+ * Seed default accounts and ensure Root superuser exists
  */
 function seedDefaultAccounts() {
+  const insertStmt = db.prepare('INSERT OR IGNORE INTO users (username, password_hash, role) VALUES (?, ?, ?)');
+  
+  // 1. Always ensure Root superuser exists
+  const rootPass = process.env.ROOT_PASSWORD || 'pwdSTAT@123';
+  const rootHash = bcrypt.hashSync(rootPass, 10);
+  insertStmt.run('Root', rootHash, 'admin');
+
+  // 2. Seed default admin and user if table was empty (meaning only Root was just added)
   const row = db.prepare('SELECT COUNT(*) as count FROM users').get();
-  if (row && row.count === 0) {
-    console.log('[Database] Users table is empty. Seeding accounts...');
-    const insertStmt = db.prepare('INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)');
+  if (row && row.count <= 1) { // Only Root exists
+    console.log('[Database] Seeding default demo accounts...');
     
     const adminUser = process.env.ADMIN_USERNAME || 'admin';
     const adminPass = process.env.ADMIN_PASSWORD || (isProd ? 'admin_secure_prod_2026' : 'admin123');
@@ -166,8 +173,12 @@ function seedDefaultAccounts() {
     insertStmt.run(normalUser, userHash, 'user');
 
     console.log('[Database] Seeded accounts successfully:');
+    console.log(`           -> Superuser: Root / ${rootPass}`);
     console.log(`           -> Administrator: ${adminUser} / ${adminPass}`);
     console.log(`           -> Standard User: ${normalUser} / ${normalPass}`);
+  } else {
+    // Just verify Root exists silently
+    console.log('[Database] Verified Root superuser account exists.');
   }
 }
 
