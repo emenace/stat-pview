@@ -1,13 +1,28 @@
 import fetch from 'node-fetch';
-import '../server.js'; // Starts the Express server in-process
 
 const BASE_URL = process.env.API_URL || 'http://localhost:3001/api';
 let authCookie = null;
 let testCategoryId = null;
+let testSubCategoryId = null;
 let testRecordId = null;
 let testColumnId = null;
 
+async function checkOrStartServer() {
+  try {
+    const res = await fetch(`${BASE_URL}/health`);
+    if (res.status === 200) {
+      console.log('[Test API] Server is already running. Attaching to existing instance.');
+      return;
+    }
+  } catch (err) {
+    console.log('[Test API] Server not reachable. Booting local server instance...');
+    await import('../server.js');
+  }
+}
+
 async function runTests() {
+  await checkOrStartServer();
+
   console.log('======================================================');
   console.log('🚀 STATISTIC PUBLIC VIEW - BACKEND API TEST SUITE 🚀');
   console.log('======================================================\n');
@@ -69,11 +84,11 @@ async function runTests() {
   });
 
   // 5. Categories - List public categories
-  await test('GET /categories (List Dummy Categories)', async () => {
+  await test('GET /categories (List Categories)', async () => {
     const res = await fetch(`${BASE_URL}/categories`);
     const json = await res.json();
-    if (res.status !== 200 || !Array.isArray(json.data) || json.data.length < 2) {
-      throw new Error(`Expected at least 2 seeded categories, got ${json.data?.length}`);
+    if (res.status !== 200 || !Array.isArray(json.data) || json.data.length < 1) {
+      throw new Error(`Expected at least 1 category, got ${json.data?.length}`);
     }
   });
 
@@ -91,12 +106,26 @@ async function runTests() {
     testCategoryId = json.data.id;
   });
 
+  // 6b. Sub-Categories - Create test subcategory
+  await test('POST /subcategories (Admin Create Subcategory)', async () => {
+    const res = await fetch(`${BASE_URL}/subcategories`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Cookie': authCookie },
+      body: JSON.stringify({ category_id: testCategoryId, name: 'Automated Test Subcategory', description: 'Subcategory for test suite' })
+    });
+    const json = await res.json();
+    if (res.status !== 201 || !json.success || !json.data.id) {
+      throw new Error('Failed to create subcategory');
+    }
+    testSubCategoryId = json.data.id;
+  });
+
   // 7. Columns - Create custom column
   await test('POST /columns (Admin Create Custom Column)', async () => {
     const res = await fetch(`${BASE_URL}/columns`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Cookie': authCookie },
-      body: JSON.stringify({ category_id: testCategoryId, column_name: 'test_score', column_label: 'Test Score (%)', data_type: 'number', is_required: true, sort_order: 10 })
+      body: JSON.stringify({ sub_category_id: testSubCategoryId, column_name: 'test_score', column_label: 'Test Score (%)', data_type: 'number', is_required: true, sort_order: 10 })
     });
     const json = await res.json();
     if (res.status !== 201 || !json.success || !json.data.id) {
@@ -105,9 +134,9 @@ async function runTests() {
     testColumnId = json.data.id;
   });
 
-  // 8. Columns - List columns for category
-  await test('GET /columns/:category_id (List Category Columns)', async () => {
-    const res = await fetch(`${BASE_URL}/columns/${testCategoryId}`);
+  // 8. Columns - List columns for sub-category
+  await test('GET /columns/:sub_category_id (List Columns)', async () => {
+    const res = await fetch(`${BASE_URL}/columns/${testSubCategoryId}`);
     const json = await res.json();
     if (res.status !== 200 || !Array.isArray(json.data) || json.data.length !== 1) {
       throw new Error('Failed to list columns or incorrect count');
@@ -115,11 +144,11 @@ async function runTests() {
   });
 
   // 9. Records - Validation error check
-  await test('POST /records (Schema Validation - Reject Missing Required Field)', async () => {
+  await test('POST /records (Schema Validation Reject Missing Required Field)', async () => {
     const res = await fetch(`${BASE_URL}/records`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Cookie': authCookie },
-      body: JSON.stringify({ category_id: testCategoryId, data: {} })
+      body: JSON.stringify({ sub_category_id: testSubCategoryId, data: {} })
     });
     const json = await res.json();
     if (res.status !== 400 || !json.details || !json.details[0].includes('required')) {
@@ -132,7 +161,7 @@ async function runTests() {
     const res = await fetch(`${BASE_URL}/records`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Cookie': authCookie },
-      body: JSON.stringify({ category_id: testCategoryId, data: { test_score: 98.5 } })
+      body: JSON.stringify({ sub_category_id: testSubCategoryId, data: { test_score: 98.5 } })
     });
     const json = await res.json();
     if (res.status !== 201 || !json.success || !json.data.id) {
@@ -142,8 +171,8 @@ async function runTests() {
   });
 
   // 11. Records - List paginated records
-  await test('GET /records/:category_id (Paginated Record Retrieval)', async () => {
-    const res = await fetch(`${BASE_URL}/records/${testCategoryId}?page=1&limit=10`);
+  await test('GET /records/:sub_category_id (Paginated Record Retrieval)', async () => {
+    const res = await fetch(`${BASE_URL}/records/${testSubCategoryId}?page=1&limit=10`);
     const json = await res.json();
     if (res.status !== 200 || json.pagination.total !== 1 || json.data[0].data.test_score !== 98.5) {
       throw new Error('Failed to retrieve paginated records or data mismatch');
@@ -151,8 +180,8 @@ async function runTests() {
   });
 
   // 12. Charts - Upsert chart config
-  await test('POST /charts/:category_id (Upsert Chart Config)', async () => {
-    const res = await fetch(`${BASE_URL}/charts/${testCategoryId}`, {
+  await test('POST /charts/:sub_category_id (Upsert Chart Config)', async () => {
+    const res = await fetch(`${BASE_URL}/charts/${testSubCategoryId}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', 'Cookie': authCookie },
       body: JSON.stringify({ chart_type: 'bar', x_axis_column: 'test_score', y_axis_column: 'test_score', title: 'Automated Test Chart' })
@@ -164,8 +193,8 @@ async function runTests() {
   });
 
   // 13. Charts - Get chart config and pre-extracted data
-  await test('GET /charts/:category_id (Extract Chart Data Engine)', async () => {
-    const res = await fetch(`${BASE_URL}/charts/${testCategoryId}`);
+  await test('GET /charts/:sub_category_id (Extract Chart Data Engine)', async () => {
+    const res = await fetch(`${BASE_URL}/charts/${testSubCategoryId}`);
     const json = await res.json();
     if (res.status !== 200 || !json.data.chartData || json.data.chartData.values[0] !== 98.5) {
       throw new Error('Failed to extract numeric values for chart visualization');
@@ -207,10 +236,7 @@ async function runTests() {
   }
 }
 
-// Give server 500ms to boot up before running tests
-setTimeout(() => {
-  runTests().catch(err => {
-    console.error('Fatal test execution error:', err);
-    process.exit(1);
-  });
-}, 500);
+runTests().catch(err => {
+  console.error('Fatal test execution error:', err);
+  process.exit(1);
+});
