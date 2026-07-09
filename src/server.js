@@ -50,7 +50,7 @@ app.use(session({
     httpOnly: true,
     secure: 'auto', // Auto-detect HTTPS/HTTP so cookies work both behind Nginx SSL and direct port access
     sameSite: 'lax',
-    maxAge: 1000 * 60 * 60 * 24 * 7 // 7 days
+    maxAge: 1000 * 60 * 60 // 1 hour
   }
 }));
 
